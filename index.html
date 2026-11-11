@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>성공회 사목예식서</title>
+<meta name="description" content="대한성공회 사목예식서 · 성무일과 · 시편 · 교회 주소록">
+<meta name="theme-color" content="#4b2a6b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <button id="btnBack" class="icon-btn" aria-label="뒤로" hidden>
+    <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <img id="emblem" class="emblem" src="icons/emblem.png" alt="대한성공회 서울교구 문장">
+  <h1 id="title">성공회 사목예식서</h1>
+  <button id="btnStar" class="icon-btn" aria-label="즐겨찾기" hidden>
+    <svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+  </button>
+  <button id="btnFont" class="icon-btn" aria-label="글자 크기">
+    <svg viewBox="0 0 24 24"><path d="M4 19l5-14 5 14M6 14h6M15 19l3-8 3 8M16 16.5h4"/></svg>
+  </button>
+</header>
+
+<div id="fontPanel" class="font-panel" hidden>
+  <button data-font="-1" aria-label="작게">가−</button>
+  <span id="fontVal">100%</span>
+  <button data-font="1" aria-label="크게">가+</button>
+  <label class="switch"><input type="checkbox" id="optDark"> 어두운 화면</label>
+  <label class="switch"><input type="checkbox" id="optWake"> 화면 켜짐 유지</label>
+</div>
+
+<main id="view" tabindex="-1"></main>
+
+<nav class="tabs" aria-label="메뉴">
+  <a href="#/home" data-tab="home"><svg viewBox="0 0 24 24"><path d="M5 4h10a3 3 0 013 3v13H8a3 3 0 01-3-3zM5 17a3 3 0 013-3h10M11 7v5M9 9h4"/></svg><span>기도서</span></a>
+  <a href="#/bible" data-tab="bible"><svg viewBox="0 0 24 24"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6a2 2 0 01-2-2V5a2 2 0 012-2zM4 18a2 2 0 012-2h12M11 7v6M8.5 9.5h5"/></svg><span>공동번역성서</span></a>
+  <a href="#/church" data-tab="church"><svg viewBox="0 0 24 24"><path d="M12 3v4M10 5h4M6 21V11l6-4 6 4v10M10 21v-5h4v5"/></svg><span>교회찾기</span></a>
+  <a href="#/sites" data-tab="sites"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.5-3.5-8.5s1-6 3.5-8.5z"/></svg><span>교구링크</span></a>
+</nav>
+
+<script src="menu.js"></script>
+<script src="churches.js"></script>
+<script src="bible.js"></script>
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
