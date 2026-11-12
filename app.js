@@ -10,7 +10,9 @@
   // ---------- storage (safe) ----------
   function load(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
   function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
-  var prefs = load("prefs", { fs: 1, dark: null, wake: true });
+  var prefs = load("prefs", { fs: 0.9, dark: null, wake: true });
+  // 기본 글자 크기를 100% → 90% 로 낮춤 (직접 바꾸지 않은 사용자에게만 적용)
+  if (!prefs.fs2) { if (prefs.fs === 1) prefs.fs = 0.9; prefs.fs2 = 1; save("prefs", prefs); }
   var stars = load("stars", []);
   var recent = load("recent", []);
 
