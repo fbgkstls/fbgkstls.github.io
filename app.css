@@ -157,11 +157,28 @@ details > .list, details > details { padding-left: 12px; }
 .lect-collect { margin: 0 0 6px; line-height: 1.85; font-size: 1.05em; }
 .lect-ending { margin: 0; color: var(--muted); line-height: 1.7; }
 .lect-alt { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
+.lect-read { border-top: 1px solid var(--line); margin-top: 14px; }
+.lect-read h3 { color: var(--accent); font-size: 15px; margin: 12px 0 6px; }
+.lect-read h3 a { color: var(--blue); text-decoration: none; font-weight: 600; }
+.lect-text p { margin: 0 0 8px; line-height: 1.9; }
+.lect-text sup { color: var(--muted); font-size: .7em; margin: 0 2px 0 3px; }
+.lect-text.poetry p { line-height: 1.8; }
+.lect-text .gl { color: var(--muted); margin-top: 8px; }
 .lect-reads { list-style: none; margin: 0; padding: 0; }
 .lect-reads li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); }
 .lect-reads li:last-child { border-bottom: 0; }
 .lect-reads b { min-width: 64px; font-size: 14px; }
 .lect-reads a { color: var(--blue); text-decoration: none; font-weight: 600; }
+.office { border-top: 4px solid var(--accent); }
+.office-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--surface2); padding: 4px; border-radius: 12px; }
+.office-tabs button { position: relative; border: 0; background: transparent; color: var(--muted); padding: 9px 2px; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.office-tabs button.on { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .office-tabs button.on { color: #16141a; }
+.office-tabs i { position: absolute; top: -7px; right: 2px; font-style: normal; font-size: 10px; background: var(--red); color: #fff; padding: 0 5px; border-radius: 8px; line-height: 16px; }
+.office-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin: 12px 0 6px; }
+.office-title { margin: 2px 0 0; font-size: 1.15em; color: var(--accent); }
+.office-head small { color: var(--muted); }
+.office-body { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 2px; margin: 0; }
 button.btn { border: 0; cursor: pointer; font-family: inherit; }
 .install { border: 2px solid var(--accent); }
 .install p { font-size: 15px; line-height: 1.7; }

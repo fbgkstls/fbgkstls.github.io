@@ -129,6 +129,55 @@
       '<div class="row"><a href="#/p/' + p[0] + '">' + (idx + 1) + '일 아침시편</a><a href="#/p/' + p[1] + '">' + (idx + 1) + "일 저녁시편</a></div>" +
       (day === 31 ? "<small>31일은 30일 시편을 사용합니다.</small>" : "") + "</section>";
   }
+  // ---------- 시간에 맞춘 오늘의 시편 ----------
+  // 아침 04:00~09:59 · 낮 10:00~15:59 · 저녁 16:00~19:59 · 밤 20:00~03:59
+  var OFFICES = [
+    { k: "am", name: "아침기도", time: "04:00~09:59", id: "e0zknxc7" },
+    { k: "noon", name: "낮기도", time: "10:00~15:59", id: "j6wig2nn" },
+    { k: "pm", name: "저녁기도", time: "16:00~19:59", id: "8sj64e4b" },
+    { k: "night", name: "밤기도", time: "20:00~24:00", id: "1xbbkkrc" }
+  ];
+  function officeNow() {
+    var hr = new Date().getHours();
+    return hr >= 4 && hr < 10 ? 0 : hr >= 10 && hr < 16 ? 1 : hr >= 16 && hr < 20 ? 2 : 3;
+  }
+  // 낮기도·밤기도 페이지에서 '아래 시편 중 …' 부분만 잘라 냄
+  function officePsalms(id) {
+    var c = CONTENT[id]; if (!c || !c.h) return "";
+    var d = document.createElement("template"); d.innerHTML = c.h; d = d.content;
+    var on = false, keep = [];
+    Array.prototype.forEach.call(d.querySelectorAll(".tx"), function (tx) {
+      var t = tx.textContent.replace(/\s+/g, " ").trim();
+      if (!on && /시편 중/.test(t)) { on = true; return; }
+      if (on && /^\d+\.\s/.test(t)) on = false;
+      if (on && !/^아래 버튼으로/.test(t)) keep.push(tx.outerHTML);
+    });
+    return keep.length ? renderPageHtml(keep.join("")) : "";
+  }
+  function officeCard(i) {
+    var o = OFFICES[i], now = officeNow(), d = new Date(), day = d.getDate();
+    var idx = Math.min(day, 30) - 1, p = window.DAILY_PSALMS[idx], wd = "일월화수목금토"[d.getDay()];
+    var pid = o.k === "am" ? p[0] : o.k === "pm" ? p[1] : null;
+    var body = pid ? (CONTENT[pid] && CONTENT[pid].h ? renderPageHtml(CONTENT[pid].h) : "") : officePsalms(o.id);
+    var sub = pid ? (idx + 1) + "일 " + (o.k === "am" ? "아침" : "저녁") + "시편 (30일 주기)" : o.name + " 시편 (한두 편을 낭송)";
+    return '<section class="card office" id="officeCard">' +
+      '<div class="office-tabs">' + OFFICES.map(function (x, j) {
+        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + (j === now ? "<i>지금</i>" : "") + "</button>";
+      }).join("") + "</div>" +
+      '<div class="office-head"><div><div class="lect-date">' + (d.getMonth() + 1) + "월 " + day + "일 (" + wd + ") · " + o.time + "</div>" +
+      '<h2 class="office-title">오늘의 시편 · ' + esc(o.name) + "</h2><small>" + esc(sub) + "</small></div>" +
+      '<a class="btn pri" href="#/p/' + o.id + '">' + esc(o.name) + " 순서 ›</a></div>" +
+      '<article class="reader office-body">' + (body || '<p class="note">시편 내용을 찾지 못했습니다.</p>') + "</article>" +
+      (day === 31 && pid ? "<small>31일은 30일 시편을 사용합니다.</small>" : "") +
+      (pid ? '<a class="hero-link" style="margin:10px 0 0;text-align:center" href="#/p/' + pid + '">이 시편 크게 보기 ›</a>' : "") + "</section>";
+  }
+  function bindOffice() {
+    var c = document.getElementById("officeCard"); if (!c) return;
+    c.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-of]"); if (!b) return;
+      var n = document.createElement("div"); n.innerHTML = officeCard(+b.dataset.of); c.replaceWith(n.firstChild); bindOffice();
+    });
+  }
   // ---------- 바로가기(홈 화면 설치) 안내 ----------
   var installEvt = null;
   var UA = navigator.userAgent || "";
@@ -183,8 +232,7 @@
     var h = secHead(1, "기도서", "대한성공회 서울교구 · 성공회 사목예식서");
     h += '<div class="search-box" style="position:static"><input id="hq" type="search" placeholder="기도문 검색 (예: 주님의 기도, 시편 23)" autocomplete="off"></div>';
     h += installCard();
-    h += lectCard();
-    h += todayCard();
+    h += officeCard(officeNow());
     h += '<section class="card"><h2>예식서</h2><div class="grid">' +
       window.HOME_TILES.map(function (t) { return '<a href="#/p/' + t[1] + '">' + esc(t[0]) + "</a>"; }).join("") + "</div>" +
       '<a class="hero-link" style="margin:12px 0 0;text-align:center" href="#/toc">전체 목차 보기 ›</a></section>';
@@ -193,7 +241,7 @@
     h += '<p class="note">기도문 화면 오른쪽 위 ☆ 를 누르면 즐겨찾기에 모입니다. 기도서는 인터넷 연결 없이도 볼 수 있습니다' + (window.CONTENT_DATE ? " (" + esc(window.CONTENT_DATE) + " 기준)" : "") + ".<br>" +
       '앱 관리: ' + esc(INFO.manager || "") + ' · <a href="#/sites?about=1" style="color:inherit">수정·추가 요청하기</a></p>';
     view.innerHTML = h;
-    bindInstall(); bindLect();
+    bindInstall(); bindOffice();
     document.getElementById("hq").addEventListener("keydown", function (e) {
       if (e.key === "Enter" && this.value.trim()) location.hash = "#/search?q=" + encodeURIComponent(this.value.trim());
     });
@@ -209,10 +257,12 @@
     var url = p && p.ch ? bibleUrl(p.b, p.ch) : window.BIBLE_SITE + "/lectionary/" + d;
     return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(ref) + " ↗</a>";
   }
+  // 앱을 열면 이번 달·다음 달 독서 본문을 미리 받아 둠(오프라인 대비)
+  setTimeout(function () { var t = new Date(), n = new Date(t.getFullYear(), t.getMonth() + 1, 1); lectMonth(ymd(t)); lectMonth(ymd(n)); }, 3000);
   function lectCard() {
     var d = new Date(); d.setDate(d.getDate() + lectOff);
     var key = ymd(d), L = (window.LECT || {})[key], wd = "일월화수목금토";
-    var h = '<section class="card lect" id="lectCard"><div class="lect-top"><h2>매일의 본기도와 독서</h2>' +
+    var h = '<section class="card lect" id="lectCard" data-key="' + key + '"><div class="lect-top"><h2>매일의 본기도와 독서</h2>' +
       '<span class="lect-nav"><button type="button" data-lo="-1" aria-label="전날">◀</button>' +
       (lectOff ? '<button type="button" data-lo="0">오늘</button>' : "") +
       '<button type="button" data-lo="1" aria-label="다음 날">▶</button></span></div>' +
@@ -228,10 +278,36 @@
         (L.e ? '<p class="lect-ending">' + esc(L.e) + "</p>" : "");
     }
     if (L.r && L.r.length) {
-      h += '<h3>독서</h3><ul class="lect-reads">' + L.r.map(function (r) { return "<li><b>" + esc(r[0]) + "</b>" + (r[1] ? refLink(r[1], key) : "") + "</li>"; }).join("") + "</ul>";
+      h += L.r.map(function (r, i) {
+        return '<div class="lect-read"><h3>' + esc(r[0]) + (r[1] ? " · " + refLink(r[1], key) : "") + '</h3><div class="lect-text" data-i="' + i + '"><p class="note" style="margin:0">본문을 불러오는 중…</p></div></div>';
+      }).join("");
     }
-    h += '<a class="btn" style="margin-top:10px" href="' + window.BIBLE_SITE + "/lectionary/" + key + '" target="_blank" rel="noopener">독서 본문 전체 읽기 ↗</a></section>';
+    h += '<p class="note" style="margin:12px 0 0">본문: 대한성공회 공동번역성서 전례독서(bible.anglican.kr)</p></section>';
     return h;
+  }
+  // 날짜별 독서 본문은 달마다 나눈 파일(lect/YYYY-MM.json)에서 불러옴
+  var lectMonths = {};
+  function lectMonth(key) {
+    var m = key.slice(0, 7);
+    if (!lectMonths[m]) lectMonths[m] = fetch("lect/" + m + ".json").then(function (r) { if (!r.ok) throw 0; return r.json(); }).catch(function () { delete lectMonths[m]; return null; });
+    return lectMonths[m];
+  }
+  function safeText(s) {
+    return String(s || "").replace(/<(\/?)(p|sup|br)(\s+class="gl")?\s*>|<[^>]*>/g, function (all, sl, tag, gl) { return tag ? "<" + sl + tag + (gl || "") + ">" : ""; });
+  }
+  function fillLect() {
+    var c = document.getElementById("lectCard"); if (!c || !c.dataset.key) return;
+    var key = c.dataset.key;
+    lectMonth(key).then(function (M) {
+      var cur = document.getElementById("lectCard"); if (!cur || cur.dataset.key !== key) return;
+      var R = M && M[key];
+      Array.prototype.forEach.call(cur.querySelectorAll(".lect-text"), function (el) {
+        var r = R && R[+el.dataset.i];
+        if (r && r[3]) { el.innerHTML = safeText(r[3]); el.classList.toggle("poetry", !!r[2]); }
+        else el.innerHTML = '<p class="note" style="margin:0">' + (navigator.onLine ? "본문을 불러오지 못했습니다." : "인터넷에 연결되면 본문이 표시됩니다.") +
+          ' <a href="' + window.BIBLE_SITE + "/lectionary/" + key + '" target="_blank" rel="noopener">공동번역성서에서 보기 ↗</a></p>';
+      });
+    });
   }
   function bindLect() {
     var c = document.getElementById("lectCard"); if (!c) return;
@@ -240,6 +316,7 @@
       var v = +b.dataset.lo; lectOff = v === 0 ? 0 : lectOff + v;
       var n = document.createElement("div"); n.innerHTML = lectCard(); c.replaceWith(n.firstChild); bindLect();
     });
+    fillLect();
   }
   function lectHtml(part) {
     var d = new Date(), wd = "일월화수목금토";
