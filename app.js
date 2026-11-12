@@ -247,8 +247,8 @@
   // ④ 서울교구 사이트 모음
   var HYMN_SITE = "https://dulkuka12.github.io/khymn/";
   function hymn() {
-    setTop("성가", false); setTab("hymn");
-    var h = secHead(3, "성가", "성공회 성가 2015 · 번호와 제목으로 찾기");
+    setTop("성가 2015", false); setTab("hymn");
+    var h = secHead(3, "성가 2015", "성공회 성가 · 번호와 제목으로 찾기");
     h += '<a class="hero-link" style="text-align:center;font-size:17px;padding:18px 16px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 찾기 열기 ↗</a>';
     h += '<section class="card"><h2>사용 방법</h2><p style="margin:0;line-height:1.8">' +
       "① 위 버튼을 누르면 「성가 2015」 화면이 열립니다.<br>" +
