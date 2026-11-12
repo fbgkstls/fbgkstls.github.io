@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.fbgkstls.prayerbook",
+        "sha256_cert_fingerprints": ["06:35:BC:49:D5:37:6A:40:B8:67:FE:93:09:31:CE:E5:8D:3B:07:34:94:A5:ED:BA:11:53:65:F1:F2:52:3B:F4"]
+      }
+    }]
