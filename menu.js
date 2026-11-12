@@ -2,8 +2,8 @@
 window.SITE = "https://book-of-prayer.imweb.me";
 
 window.HOME_TILES = [
-  ["아침기도", "e0zknxc7"], ["저녁기도", "8sj64e4b"], ["시편", "2q3k1zws"],
-  ["낮기도", "j6wig2nn"], ["밤기도", "1xbbkkrc"], ["간략한 예배", "b67szat3"],
+  ["아침기도", "e0zknxc7"], ["낮기도", "j6wig2nn"], ["저녁기도", "8sj64e4b"],
+  ["밤기도", "1xbbkkrc"], ["시편", "2q3k1zws"], ["간략한 예배", "b67szat3"],
   ["세례성사", "56iv7rek"], ["성찬1형식", "56aeml47"], ["성찬2형식", "5srxqw1h"],
   ["월별축일표", "486uh1jn"], ["본기도", "e3l3s39q"], ["간구기도", "8fob4b3f"],
   ["고해성사", "2mhfj6b5"], ["조병성사", "2jf75426"], ["상장기도", "emyje44e"],

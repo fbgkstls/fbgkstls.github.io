@@ -183,6 +183,7 @@
     var h = secHead(1, "기도서", "대한성공회 서울교구 · 성공회 사목예식서");
     h += '<div class="search-box" style="position:static"><input id="hq" type="search" placeholder="기도문 검색 (예: 주님의 기도, 시편 23)" autocomplete="off"></div>';
     h += installCard();
+    h += lectCard();
     h += todayCard();
     h += '<section class="card"><h2>예식서</h2><div class="grid">' +
       window.HOME_TILES.map(function (t) { return '<a href="#/p/' + t[1] + '">' + esc(t[0]) + "</a>"; }).join("") + "</div>" +
@@ -192,7 +193,7 @@
     h += '<p class="note">기도문 화면 오른쪽 위 ☆ 를 누르면 즐겨찾기에 모입니다. 기도서는 인터넷 연결 없이도 볼 수 있습니다' + (window.CONTENT_DATE ? " (" + esc(window.CONTENT_DATE) + " 기준)" : "") + ".<br>" +
       '앱 관리: ' + esc(INFO.manager || "") + ' · <a href="#/sites?about=1" style="color:inherit">수정·추가 요청하기</a></p>';
     view.innerHTML = h;
-    bindInstall();
+    bindInstall(); bindLect();
     document.getElementById("hq").addEventListener("keydown", function (e) {
       if (e.key === "Enter" && this.value.trim()) location.hash = "#/search?q=" + encodeURIComponent(this.value.trim());
     });
@@ -200,13 +201,51 @@
 
   // ② 매일의 본기도와 독서
   function ymd(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  // 매일의 본기도와 독서: lect.js 에 미리 담아 둔 날짜별 자료를 바로 보여 줌
+  var lectOff = 0;
+  var COLOR_CSS = { "녹색": "#2e8b57", "백색": "#f4f1ea", "흰색": "#f4f1ea", "홍색": "#c0392b", "적색": "#c0392b", "자색": "#6a3d9a", "보라색": "#6a3d9a", "장미색": "#e58fb0", "청색": "#2f6fa8", "흑색": "#222" };
+  function refLink(ref, d) {
+    var p = parseRef(ref.replace(/[,;(].*$/, "").replace(/[a-z]$/, ""));
+    var url = p && p.ch ? bibleUrl(p.b, p.ch) : window.BIBLE_SITE + "/lectionary/" + d;
+    return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(ref) + " ↗</a>";
+  }
+  function lectCard() {
+    var d = new Date(); d.setDate(d.getDate() + lectOff);
+    var key = ymd(d), L = (window.LECT || {})[key], wd = "일월화수목금토";
+    var h = '<section class="card lect" id="lectCard"><div class="lect-top"><h2>매일의 본기도와 독서</h2>' +
+      '<span class="lect-nav"><button type="button" data-lo="-1" aria-label="전날">◀</button>' +
+      (lectOff ? '<button type="button" data-lo="0">오늘</button>' : "") +
+      '<button type="button" data-lo="1" aria-label="다음 날">▶</button></span></div>' +
+      '<div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ")" + (lectOff === 0 ? " · 오늘" : "") + "</div>";
+    if (!L) {
+      return h + '<p class="note" style="margin:8px 0">이 날짜의 자료가 앱에 없습니다.</p><a class="btn pri" href="' + window.BIBLE_SITE + "/lectionary/" + key + '" target="_blank" rel="noopener">공동번역성서에서 보기 ↗</a></section>';
+    }
+    h += '<div class="lect-day">' + esc(L.d) + "</div>" +
+      '<div class="lect-meta">' + (L.c || []).map(function (c) { return '<span class="lect-chip"><i style="background:' + (COLOR_CSS[c] || "#999") + '"></i>' + esc(c) + "</span>"; }).join("") +
+      (L.m || []).map(function (m) { return '<span class="lect-chip">' + esc(m) + "</span>"; }).join("") + "</div>";
+    if (L.k && L.k.length) {
+      h += '<h3>본기도</h3>' + L.k.map(function (k, i) { return (L.k.length > 1 ? '<p class="lect-alt">' + (i + 1) + "</p>" : "") + '<p class="lect-collect">' + esc(k) + "</p>"; }).join("") +
+        (L.e ? '<p class="lect-ending">' + esc(L.e) + "</p>" : "");
+    }
+    if (L.r && L.r.length) {
+      h += '<h3>독서</h3><ul class="lect-reads">' + L.r.map(function (r) { return "<li><b>" + esc(r[0]) + "</b>" + (r[1] ? refLink(r[1], key) : "") + "</li>"; }).join("") + "</ul>";
+    }
+    h += '<a class="btn" style="margin-top:10px" href="' + window.BIBLE_SITE + "/lectionary/" + key + '" target="_blank" rel="noopener">독서 본문 전체 읽기 ↗</a></section>';
+    return h;
+  }
+  function bindLect() {
+    var c = document.getElementById("lectCard"); if (!c) return;
+    c.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-lo]"); if (!b) return;
+      var v = +b.dataset.lo; lectOff = v === 0 ? 0 : lectOff + v;
+      var n = document.createElement("div"); n.innerHTML = lectCard(); c.replaceWith(n.firstChild); bindLect();
+    });
+  }
   function lectHtml(part) {
     var d = new Date(), wd = "일월화수목금토";
     var days = [-1, 0, 1, 2, 3, 4, 5].map(function (k) { var x = new Date(d); x.setDate(d.getDate() + k); return x; });
-    var h = '<section class="card today"><h2>매일의 본기도와 독서</h2><div class="date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ")</div>" +
-      '<div class="row"><a href="' + window.BIBLE_SITE + "/lectionary/" + ymd(d) + '" target="_blank" rel="noopener">오늘의 본기도와 독서 ↗</a></div>' +
-      "<small>본기도 · 제1독서 · 성시 · 복음이 교회력에 맞추어 표시됩니다.</small></section>";
-    if (part === 1) return h;
+    if (part === 1) return lectCard();
+    var h;
     h = '<section class="card"><h2>날짜별 본기도와 독서</h2><div class="grid">' + days.map(function (x, i) {
       return '<a href="' + window.BIBLE_SITE + "/lectionary/" + ymd(x) + '" target="_blank" rel="noopener">' + (i === 1 ? "오늘" : (x.getMonth() + 1) + "/" + x.getDate()) + " (" + wd[x.getDay()] + ")</a>";
     }).join("") + '<a href="' + window.BIBLE_SITE + '/calendar" target="_blank" rel="noopener">교회력 달력</a></div></section>';
@@ -329,7 +368,7 @@
     });
     h += '<div style="height:14px"></div>' + lectHtml(2);
     h += '<p class="note">성서 본문과 전례독서는 대한성공회가 제공하는 공동번역성서 사이트(bible.anglican.kr)에서 열립니다. 인터넷 연결이 필요합니다.</p>';
-    view.innerHTML = h;
+    view.innerHTML = h; bindLect();
     var ref = document.getElementById("ref"), msg = document.getElementById("refMsg"), kw = document.getElementById("kw"), go = document.getElementById("kwGo");
     ref.addEventListener("keydown", function (e) {
       if (e.key !== "Enter") return;
@@ -481,7 +520,7 @@
   function route() {
     var hash = location.hash.replace(/^#\/?/, ""), parts = hash.split("?"), path = parts[0].split("/"), qs = {};
     (parts[1] || "").split("&").forEach(function (kv) { if (kv) { var p = kv.split("="); qs[p[0]] = decodeURIComponent(p[1] || ""); } });
-    reading = false;
+    reading = false; lectOff = 0;
     var goAbout = path[0] === "sites" && qs.about;
     if (path[0] === "p" && path[1]) page(path[1]);
     else if (path[0] === "toc") toc();
