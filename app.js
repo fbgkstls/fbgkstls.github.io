@@ -245,9 +245,26 @@
   function siteUrl(name) { var s = window.SEOUL_SITES.filter(function (x) { return x[1] === name; })[0]; return s ? s[2] : "#"; }
 
   // ④ 서울교구 사이트 모음
+  var HYMN_SITE = "https://dulkuka12.github.io/khymn/";
+  function hymn() {
+    setTop("성가", false); setTab("hymn");
+    var h = secHead(3, "성가", "성공회 성가 2015 · 번호와 제목으로 찾기");
+    h += '<a class="hero-link" style="text-align:center;font-size:17px;padding:18px 16px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 찾기 열기 ↗</a>';
+    h += '<section class="card"><h2>사용 방법</h2><p style="margin:0;line-height:1.8">' +
+      "① 위 버튼을 누르면 「성가 2015」 화면이 열립니다.<br>" +
+      "② <b>성가 번호</b>(예: 125)나 <b>제목 단어</b>(예: 평화)를 입력하고 <b>Enter</b>를 누르세요.<br>" +
+      "③ ◀ ▶ 버튼으로 이전·다음 성가로 넘어갈 수 있습니다.<br>" +
+      "④ <b>📌 책갈피</b>에 오늘 부를 성가들을 미리 저장해 두면 예배 중에 바로 찾을 수 있습니다.<br>" +
+      "⑤ 다 보신 뒤에는 휴대폰 <b>뒤로 가기</b>를 누르면 이 앱으로 돌아옵니다.</p></section>";
+    h += '<section class="card"><h2>바로가기</h2><div class="btns" style="display:flex;flex-wrap:wrap;gap:8px">' +
+      '<a class="btn pri" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">성가 찾기</a>' +
+      '<a class="btn" href="' + HYMN_SITE + 'index.html" target="_blank" rel="noopener">처음 화면 · 사용 안내</a></div></section>';
+    h += '<p class="note">성가는 별도로 운영되는 「성가 2015」 웹앱(dulkuka12.github.io/khymn)에서 열립니다. 인터넷 연결이 필요합니다.</p>';
+    view.innerHTML = h;
+  }
   function sites() {
     setTop("교구링크", false); setTab("sites");
-    var h = secHead(4, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
+    var h = secHead(5, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
     h += '<a class="hero-link" href="https://seoul.anglican.kr/" target="_blank" rel="noopener">대한성공회 서울교구 홈페이지 ↗</a>';
     var groups = [];
     window.SEOUL_SITES.forEach(function (s) { if (groups.indexOf(s[0]) < 0) groups.push(s[0]); });
@@ -397,7 +414,7 @@
     setTop("교회찾기", false); setTab("church");
     dio = dio || load("dio", "seoul");
     var D = window.DIOCESES.filter(function (d) { return d.id !== "province"; });
-    var h = secHead(3, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
+    var h = secHead(4, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
     h += '<details class="card" style="padding:0 16px"><summary>서울교구 조직 (' + window.SEOUL_ORG.length + "개 부서)</summary>" +
       window.SEOUL_ORG.map(function (o) {
         return '<div class="org"><b>' + esc(o[0]) + "</b><span>" + esc(o[1]) + "</span>" + (o[4] ? "<span>" + esc(o[4]) + "</span>" : "") +
@@ -472,6 +489,7 @@
     else if (path[0] === "church") church(qs.d, qs.q);
     else if (path[0] === "lect") bible();
     else if (path[0] === "sites") sites();
+    else if (path[0] === "hymn") hymn();
     else if (path[0] === "bible") bible(path[1]);
     else home();
     wake();
