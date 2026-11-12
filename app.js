@@ -171,7 +171,7 @@
       '<a class="btn pri" href="#/p/' + o.id + '">' + esc(o.name) + " 순서 ›</a></div>" +
       '<article class="reader office-body">' + (body || '<p class="note">시편 내용을 찾지 못했습니다.</p>') + "</article>" +
       (day === 31 && pid ? "<small>31일은 30일 시편을 사용합니다.</small>" : "") +
-      (pid ? '<a class="hero-link" style="margin:10px 0 0;text-align:center" href="#/p/' + pid + '">이 시편 크게 보기 ›</a>' : "") + "</section>";
+      (pid ? '<a class="hero-link" style="margin:8px 0 0;text-align:center" href="#/p/' + pid + '">이 시편 크게 보기 ›</a>' : "") + "</section>";
   }
   function bindOffice() {
     var c = document.getElementById("officeCard"); if (!c) return;
@@ -237,7 +237,7 @@
     h += officeCard(officeNow());
     h += '<section class="card"><h2>예식서</h2><div class="grid">' +
       window.HOME_TILES.map(function (t) { return '<a href="#/p/' + t[1] + '">' + esc(t[0]) + "</a>"; }).join("") + "</div>" +
-      '<a class="hero-link" style="margin:12px 0 0;text-align:center" href="#/toc">전체 목차 보기 ›</a></section>';
+      '<a class="hero-link" style="margin:8px 0 0;text-align:center" href="#/toc">전체 목차 보기 ›</a></section>';
     if (stars.length) h += '<section class="card"><h2>즐겨찾기</h2><ul class="list">' + stars.map(function (id) { return link(id); }).join("") + "</ul></section>";
     if (recent.length) h += '<section class="card"><h2>최근 본 기도문</h2><ul class="list">' + recent.slice(0, 5).map(function (id) { return link(id); }).join("") + "</ul></section>";
     h += '<p class="note">기도문 화면 오른쪽 위 ☆ 를 누르면 즐겨찾기에 모입니다. 기도서는 인터넷 연결 없이도 볼 수 있습니다' + (window.CONTENT_DATE ? " (" + esc(window.CONTENT_DATE) + " 기준)" : "") + ".<br>" +
@@ -284,7 +284,8 @@
         return '<div class="lect-read"><h3>' + esc(r[0]) + (r[1] ? " · " + refLink(r[1], key) : "") + '</h3><div class="lect-text" data-i="' + i + '"><p class="note" style="margin:0">본문을 불러오는 중…</p></div></div>';
       }).join("");
     }
-    h += '<p class="note" style="margin:12px 0 0">본문: 대한성공회 공동번역성서 전례독서(bible.anglican.kr)</p></section>';
+    h += '<a class="hero-link" style="margin:8px 0 0;text-align:center" href="#/note?d=' + key + '">✍ 이 말씀으로 묵상 기록하기</a>' +
+      '<p class="note" style="margin:12px 0 0">본문: 대한성공회 공동번역성서 전례독서(bible.anglican.kr)</p></section>';
     return h;
   }
   // 날짜별 독서 본문은 달마다 나눈 파일(lect/YYYY-MM.json)에서 불러옴
@@ -332,7 +333,7 @@
       link("e3l3s39q", "본기도 선택") + link("1qxwr9lz", "대림절") + link("6rlkb3qz", "성탄절") + link("acxd52l7", "사순절 1-3") +
       link("mwfjr33w", "부활절 1-4") + link("81bxjzit", "연중시기 1-5") + link("adelb742", "주요축일 1-6월") + link("acnk27tn", "주요축일 7-12월") +
       link("3hfyqln6", "성인축일") + link("486uh1jn", "월별축일표") + link("8fob4b3f", "간구기도") + "</ul>" +
-      '<a class="hero-link" style="margin:10px 0 0;text-align:center" href="#/toc">모든 본기도 목록은 전체 목차에서 ›</a></section>';
+      '<a class="hero-link" style="margin:8px 0 0;text-align:center" href="#/toc">모든 본기도 목록은 전체 목차에서 ›</a></section>';
     h += '<section class="card links"><h2>함께 보기</h2>' +
       ext(siteUrl("전례독서 오디오 성서"), "전례독서 오디오 성서", "YouTube ↗") +
       ext(siteUrl("교회력 캘린더"), "교회력 캘린더", "구글 캘린더 ↗") + "</section>";
@@ -363,11 +364,121 @@
   function siteUrl(name) { var s = window.SEOUL_SITES.filter(function (x) { return x[1] === name; })[0]; return s ? s[2] : "#"; }
 
   // ④ 서울교구 사이트 모음
-  var HYMN_SITE = "https://dulkuka12.github.io/khymn/";
+  // ---------- 묵상기록 (이 기기 안에만 저장) ----------
+  var notes = load("notes", []);
+  function saveNotes() { save("notes", notes); }
+  function lectInfo(key) {
+    var L = (window.LECT || {})[key];
+    return L ? { day: L.d, refs: (L.r || []).map(function (r) { return r[0] + " " + r[1]; }) } : { day: "", refs: [] };
+  }
+  function dateLabel(key) {
+    var p = key.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2]);
+    return p[0] + "년 " + (+p[1]) + "월 " + (+p[2]) + "일 (" + "일월화수목금토"[d.getDay()] + ")";
+  }
+  function noteView(id, qd, qq) {
+    setTop("묵상기록", !!id); setTab("note");
+    var n = id ? notes.filter(function (x) { return x.id === id; })[0] : null;
+    if (id && !n) { location.hash = "#/note"; return; }
+    var key = n ? n.date : (qd && /^\d{4}-\d{2}-\d{2}$/.test(qd) ? qd : ymd(new Date()));
+    var info = n ? { day: n.day, refs: n.refs || [] } : lectInfo(key);
+    var draft = !n ? (load("noteDraft", null) || {}) : {};
+    var text = n ? n.text : (draft.date === key ? draft.text : "");
+    var h = id ? "" : secHead(3, "묵상기록", "독서와 기도로 얻은 느낌과 감상을 적어 둡니다");
+    h += '<section class="card note-ed"><div class="note-date"><input type="date" id="nDate" value="' + key + '"' + (n ? " disabled" : "") + '>' +
+      '<span id="nDay">' + esc(info.day || "") + "</span></div>" +
+      '<div class="note-refs" id="nRefs">' + info.refs.map(function (r) { return '<span class="lect-chip">' + esc(r) + "</span>"; }).join("") + "</div>" +
+      '<textarea id="nText" placeholder="오늘의 말씀과 기도 가운데 마음에 머문 구절, 느낌, 다짐을 적어 보세요.">' + esc(text) + "</textarea>" +
+      '<div class="note-acts"><span id="nMsg" class="note-msg"></span>' +
+      (n ? '<button type="button" class="btn" id="nDel">삭제</button>' : '<a class="btn" href="#/bible">오늘의 말씀 보기</a>') +
+      '<button type="button" class="btn pri" id="nSave">' + (n ? "수정 저장" : "저장") + "</button></div></section>";
+    if (!id) {
+      h += '<section class="card"><h2>나의 묵상 (' + notes.length + ")</h2>" +
+        (notes.length ? '<div class="search-box" style="position:static;padding:0 0 8px"><input id="nq" type="search" placeholder="기록 검색 (낱말, 성서 구절)" value="' + esc(qq || "") + '" autocomplete="off"></div><ul class="list" id="nList"></ul>'
+          : '<p class="note" style="margin:0">아직 기록이 없습니다. 위에 첫 묵상을 적어 보세요.</p>') + "</section>";
+      h += '<section class="card"><h2>보관 · 옮기기</h2><p class="note" style="margin:0 0 10px">기록은 <b>이 휴대폰 안에만</b> 저장되며 어디에도 전송되지 않습니다. 앱을 지우거나 휴대폰을 바꾸면 사라지니, 가끔 <b>내보내기</b>로 파일을 보관해 두세요.</p>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn" id="nExpTxt">글로 내보내기 (.txt)</button><button type="button" class="btn" id="nExp">백업 파일 (.json)</button><button type="button" class="btn" id="nImpBtn">백업 불러오기</button><input type="file" id="nImp" accept=".json,application/json" hidden></div></section>';
+    }
+    view.innerHTML = h;
+    var ta = document.getElementById("nText"), msg = document.getElementById("nMsg"), dateIn = document.getElementById("nDate");
+    function grow() { ta.style.height = "auto"; ta.style.height = Math.max(180, ta.scrollHeight + 4) + "px"; }
+    grow();
+    ta.addEventListener("input", function () { grow(); if (!n) save("noteDraft", { date: dateIn.value, text: ta.value }); msg.textContent = ""; });
+    if (!n) dateIn.addEventListener("change", function () {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateIn.value)) return;
+      var i2 = lectInfo(dateIn.value);
+      document.getElementById("nDay").textContent = i2.day;
+      document.getElementById("nRefs").innerHTML = i2.refs.map(function (r) { return '<span class="lect-chip">' + esc(r) + "</span>"; }).join("");
+      save("noteDraft", { date: dateIn.value, text: ta.value });
+    });
+    document.getElementById("nSave").onclick = function () {
+      var t = ta.value.trim();
+      if (!t) { msg.textContent = "내용을 적어 주세요."; ta.focus(); return; }
+      var now = Date.now();
+      if (n) { n.text = t; n.updated = now; }
+      else {
+        var k = dateIn.value || ymd(new Date()), i3 = lectInfo(k);
+        notes.unshift({ id: now.toString(36), date: k, day: i3.day, refs: i3.refs, text: t, created: now, updated: now });
+        save("noteDraft", null);
+      }
+      notes.sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : b.created - a.created; });
+      saveNotes();
+      if (n) { msg.textContent = "저장했습니다."; } else { noteView(null, null, ""); document.getElementById("nMsg").textContent = "저장했습니다."; }
+    };
+    var del = document.getElementById("nDel");
+    if (del) del.onclick = function () {
+      if (!confirm("이 기록을 삭제할까요? 삭제하면 되돌릴 수 없습니다.")) return;
+      notes = notes.filter(function (x) { return x.id !== n.id; }); saveNotes(); location.hash = "#/note";
+    };
+    if (id) return;
+    var list = document.getElementById("nList"), nq = document.getElementById("nq");
+    function renderList() {
+      if (!list) return;
+      var q = (nq.value || "").trim().replace(/\s+/g, "");
+      var rows = notes.filter(function (x) { return !q || (x.text + x.day + (x.refs || []).join("")).replace(/\s+/g, "").indexOf(q) >= 0; });
+      list.innerHTML = rows.length ? rows.map(function (x) {
+        return '<li><a href="#/note/' + esc(x.id) + '">' + esc(dateLabel(x.date)) + (x.day ? " · " + esc(x.day) : "") +
+          '<span class="sub note-prev">' + esc(x.text.slice(0, 120)) + "</span></a></li>";
+      }).join("") : '<li class="empty" style="padding:12px">검색 결과가 없습니다.</li>';
+    }
+    if (nq) { nq.oninput = renderList; renderList(); }
+    function download(name, body, type) {
+      var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([body], { type: type }));
+      a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }
+    var stamp = ymd(new Date());
+    document.getElementById("nExpTxt").onclick = function () {
+      if (!notes.length) { alert("내보낼 기록이 없습니다."); return; }
+      download("묵상기록-" + stamp + ".txt", "﻿" + notes.map(function (x) {
+        return "■ " + dateLabel(x.date) + (x.day ? " · " + x.day : "") + "\n" + ((x.refs || []).length ? "  (" + x.refs.join(", ") + ")\n" : "") + "\n" + x.text + "\n";
+      }).join("\n────────────\n\n"), "text/plain;charset=utf-8");
+    };
+    document.getElementById("nExp").onclick = function () {
+      if (!notes.length) { alert("내보낼 기록이 없습니다."); return; }
+      download("묵상기록-백업-" + stamp + ".json", JSON.stringify({ app: "prayerbook-notes", v: 1, notes: notes }), "application/json");
+    };
+    var imp = document.getElementById("nImp");
+    document.getElementById("nImpBtn").onclick = function () { imp.click(); };
+    imp.onchange = function () {
+      var f = imp.files && imp.files[0]; if (!f) return;
+      var rd = new FileReader();
+      rd.onload = function () {
+        try {
+          var j = JSON.parse(rd.result), arr = (j && j.notes) || [];
+          var have = {}; notes.forEach(function (x) { have[x.id] = 1; });
+          var add = arr.filter(function (x) { return x && typeof x.text === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.date) && x.id && !have[x.id]; })
+            .map(function (x) { return { id: String(x.id), date: x.date, day: String(x.day || ""), refs: Array.isArray(x.refs) ? x.refs.map(String) : [], text: x.text, created: +x.created || Date.now(), updated: +x.updated || Date.now() }; });
+          notes = notes.concat(add).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : b.created - a.created; });
+          saveNotes(); alert(add.length + "개의 기록을 불러왔습니다."); noteView();
+        } catch (e) { alert("백업 파일을 읽지 못했습니다."); }
+      };
+      rd.readAsText(f);
+    };
+  }
+  var HYMN_SITE ="https://dulkuka12.github.io/khymn/";
   function hymn() {
     setTop("성가 2015", false); setTab("hymn");
-    var h = secHead(3, "성가 2015", "성공회 성가 · 번호와 제목으로 찾기");
-    h += '<a class="hero-link" style="text-align:center;font-size:17px;padding:18px 16px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 찾기 열기 ↗</a>';
+    var h = secHead(4, "성가 2015", "성공회 성가 · 번호와 제목으로 찾기");
+    h += '<a class="hero-link" style="text-align:center;font-size:17px;padding:12px 14px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 찾기 열기 ↗</a>';
     h += '<section class="card"><h2>사용 방법</h2><p style="margin:0;line-height:1.8">' +
       "① 위 버튼을 누르면 「성가 2015」 화면이 열립니다.<br>" +
       "② <b>성가 번호</b>(예: 125)나 <b>제목 단어</b>(예: 평화)를 입력하고 <b>Enter</b>를 누르세요.<br>" +
@@ -382,7 +493,7 @@
   }
   function sites() {
     setTop("교구링크", false); setTab("sites");
-    var h = secHead(5, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
+    var h = secHead(6, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
     h += '<a class="hero-link" href="https://seoul.anglican.kr/" target="_blank" rel="noopener">대한성공회 서울교구 홈페이지 ↗</a>';
     var groups = [];
     window.SEOUL_SITES.forEach(function (s) { if (groups.indexOf(s[0]) < 0) groups.push(s[0]); });
@@ -532,7 +643,7 @@
     setTop("교회찾기", false); setTab("church");
     dio = dio || load("dio", "seoul");
     var D = window.DIOCESES.filter(function (d) { return d.id !== "province"; });
-    var h = secHead(4, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
+    var h = secHead(5, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
     h += '<details class="card" style="padding:0 16px"><summary>서울교구 조직 (' + window.SEOUL_ORG.length + "개 부서)</summary>" +
       window.SEOUL_ORG.map(function (o) {
         return '<div class="org"><b>' + esc(o[0]) + "</b><span>" + esc(o[1]) + "</span>" + (o[4] ? "<span>" + esc(o[4]) + "</span>" : "") +
@@ -608,6 +719,7 @@
     else if (path[0] === "lect") bible();
     else if (path[0] === "sites") sites();
     else if (path[0] === "hymn") hymn();
+    else if (path[0] === "note") noteView(path[1], qs.d, qs.q);
     else if (path[0] === "bible") bible(path[1]);
     else home();
     wake();
