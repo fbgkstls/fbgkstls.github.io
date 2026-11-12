@@ -129,6 +129,52 @@
       '<div class="row"><a href="#/p/' + p[0] + '">' + (idx + 1) + '일 아침시편</a><a href="#/p/' + p[1] + '">' + (idx + 1) + "일 저녁시편</a></div>" +
       (day === 31 ? "<small>31일은 30일 시편을 사용합니다.</small>" : "") + "</section>";
   }
+  // ---------- 바로가기(홈 화면 설치) 안내 ----------
+  var installEvt = null;
+  var UA = navigator.userAgent || "";
+  var IS_STANDALONE = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true || document.referrer.indexOf("android-app://") === 0;
+  var IS_IOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var IS_KAKAO = /KAKAOTALK/i.test(UA), IS_INAPP = IS_KAKAO || /NAVER|Instagram|FBAN|FBAV|Line\//i.test(UA);
+  var IS_SAMSUNG = /SamsungBrowser/i.test(UA), IS_ANDROID = /Android/i.test(UA);
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault(); installEvt = e;
+    var b = document.getElementById("btnInstall"); if (b) b.hidden = false;
+  });
+  window.addEventListener("appinstalled", function () {
+    installEvt = null; prefs.installed = true; save("prefs", prefs);
+    var c = document.getElementById("installCard"); if (c) c.remove();
+  });
+  function installGuide() {
+    if (IS_INAPP) return (IS_IOS ? "지금은 앱 안의 브라우저로 열려 있습니다. 아래 버튼을 누르거나 오른쪽 아래 메뉴에서 <b>'Safari로 열기'</b>를 고른 뒤, Safari에서 다시 안내를 따라 주세요."
+      : "지금은 앱 안의 브라우저로 열려 있습니다. 아래 버튼을 눌러 <b>Chrome</b>(또는 삼성 인터넷)으로 연 뒤, 다시 안내를 따라 주세요.");
+    if (IS_IOS) return "① 화면 아래(또는 위)의 <b>공유 버튼 <span aria-hidden=\"true\">⎋</span>(네모에 위쪽 화살표)</b>을 누릅니다.<br>② 목록에서 <b>'홈 화면에 추가'</b>를 누릅니다.<br>③ 오른쪽 위 <b>'추가'</b>를 누르면 홈 화면에 아이콘이 생깁니다.";
+    if (IS_SAMSUNG) return "아래 버튼을 누르거나, 화면 아래 <b>메뉴(≡) → '현재 페이지 추가' → '홈 화면'</b>을 누르면 휴대폰 바탕화면에 아이콘이 생깁니다.";
+    if (IS_ANDROID) return "아래 <b>'바로가기 만들기'</b> 버튼을 누르고 <b>'설치'</b>를 고르면 휴대폰 바탕화면에 아이콘이 생깁니다.<br>버튼이 없으면 오른쪽 위 <b>메뉴(⋮) → '홈 화면에 추가'</b>(또는 '앱 설치')를 누르세요.";
+    return "아래 <b>'바로가기 만들기'</b> 버튼을 누르고 <b>'설치'</b>를 고르면 바탕화면과 시작 메뉴에 아이콘이 생깁니다.<br>버튼이 없으면 Chrome·Edge 주소창 오른쪽의 <b>설치 아이콘(⊕)</b>을 누르세요.";
+  }
+  function installCard() {
+    if (IS_STANDALONE || prefs.installed || prefs.hideInstall) return "";
+    var out = IS_INAPP ? (IS_KAKAO ? "kakaotalk://web/openExternal?url=" + encodeURIComponent(location.href)
+      : IS_ANDROID ? "intent://" + location.href.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end" : "") : "";
+    return '<section class="card install" id="installCard"><h2>📲 바탕화면에 바로가기 만들기</h2>' +
+      '<p style="margin:0 0 8px">한 번만 해 두면 다음부터는 링크를 찾을 필요 없이 <b>아이콘을 눌러 바로</b> 열 수 있습니다. 인터넷이 없어도 기도서를 볼 수 있습니다.</p>' +
+      '<p class="guide">' + installGuide() + "</p>" +
+      '<div class="btns">' +
+      (out ? '<a class="btn pri" href="' + esc(out) + '">' + (IS_IOS ? "Safari로 열기" : "Chrome으로 열기") + "</a>" : "") +
+      (!IS_INAPP && !IS_IOS ? '<button class="btn pri" id="btnInstall" type="button"' + (installEvt ? "" : " hidden") + ">바로가기 만들기</button>" : "") +
+      '<button class="btn" id="btnInstallHide" type="button">다시 보지 않기</button></div></section>';
+  }
+  function bindInstall() {
+    var b = document.getElementById("btnInstall");
+    if (b) b.addEventListener("click", function () {
+      if (!installEvt) return;
+      installEvt.prompt();
+      installEvt.userChoice.then(function (r) { if (r.outcome === "accepted") { prefs.installed = true; save("prefs", prefs); var c = document.getElementById("installCard"); if (c) c.remove(); } });
+      installEvt = null; b.hidden = true;
+    });
+    var x = document.getElementById("btnInstallHide");
+    if (x) x.addEventListener("click", function () { prefs.hideInstall = true; save("prefs", prefs); document.getElementById("installCard").remove(); });
+  }
   function secHead(n, title, sub) {
     return '<div class="sec-head"><img src="icons/emblem.png" alt=""><div><b><span class="sec-num">' + n + "</span>" + esc(title) + "</b><span>" + esc(sub) + "</span></div></div>";
   }
@@ -136,6 +182,7 @@
     setTop(APP_TITLE, false); setTab("home");
     var h = secHead(1, "기도서", "대한성공회 서울교구 · 성공회 사목예식서");
     h += '<div class="search-box" style="position:static"><input id="hq" type="search" placeholder="기도문 검색 (예: 주님의 기도, 시편 23)" autocomplete="off"></div>';
+    h += installCard();
     h += todayCard();
     h += '<section class="card"><h2>예식서</h2><div class="grid">' +
       window.HOME_TILES.map(function (t) { return '<a href="#/p/' + t[1] + '">' + esc(t[0]) + "</a>"; }).join("") + "</div>" +
@@ -145,6 +192,7 @@
     h += '<p class="note">기도문 화면 오른쪽 위 ☆ 를 누르면 즐겨찾기에 모입니다. 기도서는 인터넷 연결 없이도 볼 수 있습니다' + (window.CONTENT_DATE ? " (" + esc(window.CONTENT_DATE) + " 기준)" : "") + ".<br>" +
       '앱 관리: ' + esc(INFO.manager || "") + ' · <a href="#/sites?about=1" style="color:inherit">수정·추가 요청하기</a></p>';
     view.innerHTML = h;
+    bindInstall();
     document.getElementById("hq").addEventListener("keydown", function (e) {
       if (e.key === "Enter" && this.value.trim()) location.hash = "#/search?q=" + encodeURIComponent(this.value.trim());
     });

@@ -143,6 +143,11 @@ details > .list, details > details { padding-left: 12px; }
 }
 .btn.pri { background: var(--accent); color: #fff; }
 :root[data-theme="dark"] .btn.pri { color: #16141a; }
+button.btn { border: 0; cursor: pointer; font-family: inherit; }
+.install { border: 2px solid var(--accent); }
+.install p { font-size: 15px; line-height: 1.7; }
+.install .guide { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; margin: 0 0 10px; }
+.install .btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .note { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 16px; }
 
 .grid.chapters { grid-template-columns: repeat(5, 1fr); }
