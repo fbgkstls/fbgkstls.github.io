@@ -1,5 +1,5 @@
 // Offline cache. Bump VERSION whenever any file changes (e.g. after update-content.ps1).
-var VERSION = "v2026-11-13m";
+var VERSION = "v2026-11-13n";
 var FILES = [
   "./", "./index.html", "./note-guide.html", "./privacy.html", "./app.css", "./app.js", "./menu.js", "./content.js", "./lect.js", "./churches.js", "./bible.js",
   "./manifest.webmanifest", "./icons/emblem.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png"

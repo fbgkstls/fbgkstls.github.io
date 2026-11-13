@@ -373,6 +373,7 @@
   // ④ 서울교구 사이트 모음
   // ---------- 묵상기록 (이 기기 안에만 저장) ----------
   var notes = load("notes", []);
+  var NOTE_MAX = 2000; // A4 한 장 분량(글자 크기 10pt 기준 약 2,000자)
   function saveNotes() { save("notes", notes); }
   function lectInfo(key) {
     var L = (window.LECT || {})[key];
@@ -394,7 +395,8 @@
     h += '<section class="card note-ed"><div class="note-date"><input type="date" id="nDate" value="' + key + '"' + (n ? " disabled" : "") + '>' +
       '<span id="nDay">' + esc(info.day || "") + "</span></div>" +
       '<div class="note-refs" id="nRefs">' + info.refs.map(function (r) { return '<span class="lect-chip">' + esc(r) + "</span>"; }).join("") + "</div>" +
-      '<textarea id="nText" placeholder="오늘의 말씀과 기도 가운데 마음에 머문 구절, 느낌, 다짐을 적어 보세요.">' + esc(text) + "</textarea>" +
+      '<textarea id="nText" maxlength="' + NOTE_MAX + '" placeholder="오늘의 말씀과 기도 가운데 마음에 머문 구절, 느낌, 다짐을 적어 보세요.">' + esc(text) + "</textarea>" +
+      '<div class="note-count" id="nCount"></div>' +
       '<div class="note-acts"><span id="nMsg" class="note-msg"></span>' +
       (n ? '<button type="button" class="btn" id="nDel">삭제</button>' : '<a class="btn" href="#/bible">오늘의 말씀 보기</a>') +
       '<button type="button" class="btn pri" id="nSave">' + (n ? "수정 저장" : "저장") + "</button></div></section>";
@@ -402,15 +404,22 @@
       h += '<section class="card"><h2>나의 묵상 (' + notes.length + ")</h2>" +
         (notes.length ? '<div class="search-box" style="position:static;padding:0 0 8px"><input id="nq" type="search" placeholder="기록 검색 (낱말, 성서 구절)" value="' + esc(qq || "") + '" autocomplete="off"></div><ul class="list" id="nList"></ul>'
           : '<p class="note" style="margin:0">아직 기록이 없습니다. 위에 첫 묵상을 적어 보세요.</p>') + "</section>";
-      h += '<section class="card"><h2>보관 · 옮기기</h2><p class="note" style="margin:0 0 10px">기록은 <b>이 휴대폰 안에만</b> 저장되며 어디에도 전송되지 않습니다. 앱을 지우거나 휴대폰을 바꾸면 사라지니, 가끔 <b>내보내기</b>로 파일을 보관해 두세요.</p>' +
+      var used = JSON.stringify(notes).length * 2, usedTxt = used < 1024 * 1024 ? Math.max(1, Math.round(used / 1024)) + "KB" : (used / 1048576).toFixed(1) + "MB";
+      h += '<section class="card"><h2>보관 · 옮기기</h2><p class="note-count" style="margin:0 0 6px">저장된 기록 ' + notes.length + "개 · 사용 공간 약 " + usedTxt + " / 5MB (A4 약 1,000장 분량까지 저장 가능)</p>" + '<p class="note" style="margin:0 0 10px">기록은 <b>이 휴대폰 안에만</b> 저장되며 어디에도 전송되지 않습니다. 앱을 지우거나 휴대폰을 바꾸면 사라지니, 가끔 <b>내보내기</b>로 파일을 보관해 두세요.</p>' +
         '<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn" id="nExpTxt">글로 내보내기 (.txt)</button><button type="button" class="btn" id="nExp">백업 파일 (.json)</button><button type="button" class="btn" id="nImpBtn">백업 불러오기</button><input type="file" id="nImp" accept=".json,application/json" hidden></div>' +
         '<p class="note" style="margin:8px 0 0"><a href="note-guide.html" style="color:var(--accent);font-weight:700">묵상기록 저장 안내 (꼭 읽어 주세요) ›</a> · <a href="privacy.html" style="color:inherit">개인정보처리방침</a></p></section>';
     }
     view.innerHTML = h;
     var ta = document.getElementById("nText"), msg = document.getElementById("nMsg"), dateIn = document.getElementById("nDate");
     function grow() { ta.style.height = "auto"; ta.style.height = Math.max(180, ta.scrollHeight + 4) + "px"; }
-    grow();
-    ta.addEventListener("input", function () { grow(); if (!n) save("noteDraft", { date: dateIn.value, text: ta.value }); msg.textContent = ""; });
+    var cnt = document.getElementById("nCount");
+    function count() {
+      var len = ta.value.length;
+      cnt.textContent = len.toLocaleString() + " / " + NOTE_MAX.toLocaleString() + "자 · A4 " + (len / NOTE_MAX).toFixed(1) + "장";
+      cnt.classList.toggle("warn", len >= NOTE_MAX * 0.9);
+    }
+    grow(); count();
+    ta.addEventListener("input", function () { grow(); count();if (!n) save("noteDraft", { date: dateIn.value, text: ta.value }); msg.textContent = ""; });
     if (!n) dateIn.addEventListener("change", function () {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(dateIn.value)) return;
       var i2 = lectInfo(dateIn.value);
