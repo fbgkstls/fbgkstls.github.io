@@ -132,16 +132,21 @@
       (day === 31 ? "<small>31일은 30일 시편을 사용합니다.</small>" : "") + "</section>";
   }
   // ---------- 시간에 맞춘 오늘의 시편 ----------
-  // 아침 04:00~09:59 · 낮 10:00~15:59 · 저녁 16:00~19:59 · 밤 20:00~03:59
+  // 아침 05:00~10:00 · 저녁 17:00~20:00 · 밤 20:00~24:00
   var OFFICES = [
-    { k: "am", name: "아침기도", time: "04:00~09:59", id: "e0zknxc7" },
-    { k: "noon", name: "낮기도", time: "10:00~15:59", id: "j6wig2nn" },
-    { k: "pm", name: "저녁기도", time: "16:00~19:59", id: "8sj64e4b" },
-    { k: "night", name: "밤기도", time: "20:00~24:00", id: "1xbbkkrc" }
+    { k: "am", name: "아침기도", time: "05:00~10:00", from: 5, to: 10, id: "e0zknxc7" },
+    { k: "pm", name: "저녁기도", time: "17:00~20:00", from: 17, to: 20, id: "8sj64e4b" },
+    { k: "night", name: "밤기도", time: "20:00~24:00", from: 20, to: 24, id: "1xbbkkrc" }
   ];
-  function officeNow() {
+  // 기도 시간 안이면 그 기도, 아니면 다음에 올 기도(10~17시 → 저녁기도, 0~5시 → 아침기도)
+  function officeIn() {
     var hr = new Date().getHours();
-    return hr >= 4 && hr < 10 ? 0 : hr >= 10 && hr < 16 ? 1 : hr >= 16 && hr < 20 ? 2 : 3;
+    for (var i = 0; i < OFFICES.length; i++) if (hr >= OFFICES[i].from && hr < OFFICES[i].to) return i;
+    return -1;
+  }
+  function officeNow() {
+    var i = officeIn(); if (i >= 0) return i;
+    return new Date().getHours() < 5 ? 0 : 1;
   }
   // 낮기도·밤기도 페이지에서 '아래 시편 중 …' 부분만 잘라 냄
   function officePsalms(id) {
@@ -157,16 +162,16 @@
     return keep.length ? renderPageHtml(keep.join("")) : "";
   }
   function officeCard(i) {
-    var o = OFFICES[i], now = officeNow(), d = new Date(), day = d.getDate();
+    var o = OFFICES[i], now = officeIn(), d = new Date(), day = d.getDate();
     var idx = Math.min(day, 30) - 1, p = window.DAILY_PSALMS[idx], wd = "일월화수목금토"[d.getDay()];
     var pid = o.k === "am" ? p[0] : o.k === "pm" ? p[1] : null;
     var body = pid ? (CONTENT[pid] && CONTENT[pid].h ? renderPageHtml(CONTENT[pid].h) : "") : officePsalms(o.id);
     var sub = pid ? (idx + 1) + "일 " + (o.k === "am" ? "아침" : "저녁") + "시편 (30일 주기)" : o.name + " 시편 (한두 편을 낭송)";
     return '<section class="card office" id="officeCard">' +
       '<div class="office-tabs">' + OFFICES.map(function (x, j) {
-        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + (j === now ? "<i>지금</i>" : "") + "</button>";
+        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + "<small>" + x.time + "</small>" + (j === now ? "<i>지금</i>" : "") + "</button>";
       }).join("") + "</div>" +
-      '<div class="office-head"><div><div class="lect-date">' + (d.getMonth() + 1) + "월 " + day + "일 (" + wd + ") · " + o.time + "</div>" +
+      '<div class="office-head"><div><div class="lect-date">' + (d.getMonth() + 1) + "월 " + day + "일 (" + wd + ")</div>" +
       '<h2 class="office-title">오늘의 시편 · ' + esc(o.name) + "</h2><small>" + esc(sub) + "</small></div>" +
       '<a class="btn pri" href="#/p/' + o.id + '">' + esc(o.name) + " 순서 ›</a></div>" +
       '<article class="reader office-body">' + (body || '<p class="note">시편 내용을 찾지 못했습니다.</p>') + "</article>" +
