@@ -396,8 +396,7 @@
       '<span id="nDay">' + esc(info.day || "") + "</span></div>" +
       '<div class="note-refs" id="nRefs">' + info.refs.map(function (r) { return '<span class="lect-chip">' + esc(r) + "</span>"; }).join("") + "</div>" +
       '<textarea id="nText" maxlength="' + NOTE_MAX + '" placeholder="오늘의 말씀과 기도 가운데 마음에 머문 구절, 느낌, 다짐을 적어 보세요.">' + esc(text) + "</textarea>" +
-      '<div class="note-count" id="nCount"></div>' +
-      '<div class="note-acts"><span id="nMsg" class="note-msg"></span>' +
+      '<div class="note-acts"><span class="note-left"><span class="note-count" id="nCount"></span><span id="nMsg" class="note-msg"></span></span>' +
       (n ? '<button type="button" class="btn" id="nDel">삭제</button>' : '<a class="btn" href="#/bible">오늘의 말씀 보기</a>') +
       '<button type="button" class="btn pri" id="nSave">' + (n ? "수정 저장" : "저장") + "</button></div></section>";
     if (!id) {
