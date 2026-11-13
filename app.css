@@ -241,8 +241,21 @@ details.card > summary { padding: 10px 0; }
 .office-tabs button { padding: 7px 2px; }
 .office-head { margin: 8px 0 4px; }
 .office-body { padding: 6px 2px; }
-.note-refs { margin: 6px 0 8px; }
+.note-refs { margin: 6px 0 8px; gap: 3px 4px; }
 .note-acts { margin-top: 8px; }
+/* 날짜 칸을 한 줄 전체로 넓혀 큰 글씨 휴대폰에서도 다 보이게 */
+.note-date { gap: 4px 10px; }
+.note-date input { height: 40px; box-sizing: border-box; min-width: 10.5em; }
+@media (max-width: 520px) {
+  .note-date input { flex: 1 1 100%; width: 100%; min-width: 0; }
+  .note-date span { flex: 1 1 100%; }
+}
+.lect-chip { padding: 1px 8px; line-height: 1.5; }
+.note-msg { white-space: nowrap; font-size: 13px; }
+/* 아래 탭 글자가 큰 글씨 설정에서 서로 겹치지 않도록 */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.tabs a { min-width: 0; overflow: hidden; }
+.tabs a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; padding: 0 1px; }
 .install p { margin: 0 0 6px; line-height: 1.6; }
 .install .guide { padding: 8px 10px; margin: 0 0 8px; }
 .note { margin-top: 10px; }
