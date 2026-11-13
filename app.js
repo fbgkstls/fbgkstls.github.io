@@ -138,15 +138,17 @@
     { k: "pm", name: "저녁기도", time: "17:00~20:00", from: 17, to: 20, id: "8sj64e4b" },
     { k: "night", name: "밤기도", time: "20:00~24:00", from: 20, to: 24, id: "1xbbkkrc" }
   ];
-  // 기도 시간 안이면 그 기도, 아니면 다음에 올 기도(10~17시 → 저녁기도, 0~5시 → 아침기도)
+  // '지금' 표시: 실제 기도 시간 안일 때
   function officeIn() {
     var hr = new Date().getHours();
     for (var i = 0; i < OFFICES.length; i++) if (hr >= OFFICES[i].from && hr < OFFICES[i].to) return i;
     return -1;
   }
+  // 펼쳐 보여 줄 기도: 다음 기도는 시작 1시간 전부터
+  // 04:00~15:59 아침기도 · 16:00~19:59 저녁기도 · 20:00~03:59 밤기도
   function officeNow() {
-    var i = officeIn(); if (i >= 0) return i;
-    return new Date().getHours() < 5 ? 0 : 1;
+    var hr = new Date().getHours();
+    return hr >= 4 && hr < 16 ? 0 : hr >= 16 && hr < 20 ? 1 : 2;
   }
   // 낮기도·밤기도 페이지에서 '아래 시편 중 …' 부분만 잘라 냄
   function officePsalms(id) {
@@ -169,7 +171,7 @@
     var sub = pid ? (idx + 1) + "일 " + (o.k === "am" ? "아침" : "저녁") + "시편 (30일 주기)" : o.name + " 시편 (한두 편을 낭송)";
     return '<section class="card office" id="officeCard">' +
       '<div class="office-tabs">' + OFFICES.map(function (x, j) {
-        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + "<small>" + x.time + "</small>" + (j === now ? "<i>지금</i>" : "") + "</button>";
+        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + "<small>" + x.time + "</small>" + (j === now ? "<i>지금</i>" : now < 0 && j === officeNow() && (new Date().getHours() + 1) % 24 === x.from ? "<i>곧</i>" : "") + "</button>";
       }).join("") + "</div>" +
       '<div class="office-head"><div><div class="lect-date">' + (d.getMonth() + 1) + "월 " + day + "일 (" + wd + ")</div>" +
       '<h2 class="office-title">오늘의 시편 · ' + esc(o.name) + "</h2><small>" + esc(sub) + "</small></div>" +
