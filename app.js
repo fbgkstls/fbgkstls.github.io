@@ -171,7 +171,7 @@
     var sub = pid ? (idx + 1) + "일 " + (o.k === "am" ? "아침" : "저녁") + "시편 (30일 주기)" : o.name + " 시편 (한두 편을 낭송)";
     return '<section class="card office" id="officeCard">' +
       '<div class="office-tabs">' + OFFICES.map(function (x, j) {
-        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + "<small>" + x.time + "</small>" + (j === now ? "<i>지금</i>" : now < 0 && j === officeNow() && (new Date().getHours() + 1) % 24 === x.from ? "<i>곧</i>" : "") + "</button>";
+        return '<button type="button" data-of="' + j + '" class="' + (j === i ? "on" : "") + '">' + x.name + (j === now ? "<i>지금</i>" : now < 0 && j === officeNow() && (new Date().getHours() + 1) % 24 === x.from ? "<i>곧</i>" : "") + "</button>";
       }).join("") + "</div>" +
       '<div class="office-head"><div><div class="lect-date">' + (d.getMonth() + 1) + "월 " + day + "일 (" + wd + ")</div>" +
       '<h2 class="office-title">오늘의 시편 · ' + esc(o.name) + "</h2><small>" + esc(sub) + "</small></div>" +
