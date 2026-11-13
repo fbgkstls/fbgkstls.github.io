@@ -401,7 +401,8 @@
         (notes.length ? '<div class="search-box" style="position:static;padding:0 0 8px"><input id="nq" type="search" placeholder="기록 검색 (낱말, 성서 구절)" value="' + esc(qq || "") + '" autocomplete="off"></div><ul class="list" id="nList"></ul>'
           : '<p class="note" style="margin:0">아직 기록이 없습니다. 위에 첫 묵상을 적어 보세요.</p>') + "</section>";
       h += '<section class="card"><h2>보관 · 옮기기</h2><p class="note" style="margin:0 0 10px">기록은 <b>이 휴대폰 안에만</b> 저장되며 어디에도 전송되지 않습니다. 앱을 지우거나 휴대폰을 바꾸면 사라지니, 가끔 <b>내보내기</b>로 파일을 보관해 두세요.</p>' +
-        '<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn" id="nExpTxt">글로 내보내기 (.txt)</button><button type="button" class="btn" id="nExp">백업 파일 (.json)</button><button type="button" class="btn" id="nImpBtn">백업 불러오기</button><input type="file" id="nImp" accept=".json,application/json" hidden></div></section>';
+        '<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn" id="nExpTxt">글로 내보내기 (.txt)</button><button type="button" class="btn" id="nExp">백업 파일 (.json)</button><button type="button" class="btn" id="nImpBtn">백업 불러오기</button><input type="file" id="nImp" accept=".json,application/json" hidden></div>' +
+        '<p class="note" style="margin:8px 0 0"><a href="note-guide.html" style="color:var(--accent);font-weight:700">묵상기록 저장 안내 (꼭 읽어 주세요) ›</a> · <a href="privacy.html" style="color:inherit">개인정보처리방침</a></p></section>';
     }
     view.innerHTML = h;
     var ta = document.getElementById("nText"), msg = document.getElementById("nMsg"), dateIn = document.getElementById("nDate");
