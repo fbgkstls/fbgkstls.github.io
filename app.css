@@ -277,6 +277,20 @@ details > summary, details.card > summary { padding: 7px 4px; }
 .note-ed textarea { padding: 8px 10px; }
 .card { padding: 9px 12px; margin-bottom: 8px; }
 .office-head { margin: 6px 0 3px; }
+/* 줄 간격 좁히기 (날짜 · 교회력 · 전례색 · 본기도 · 독서) */
+.lect-top h2 { line-height: 1.3; }
+.lect-date { margin-top: 2px; line-height: 1.3; }
+.lect-day { margin: 0 0 3px; line-height: 1.25; }
+.lect-meta { gap: 4px; margin-bottom: 2px; }
+.lect-chip { line-height: 1.4; font-size: 12px; }
+.lect h3 { margin: 6px 0 2px; line-height: 1.3; }
+.lect-collect { line-height: 1.6; margin: 0 0 3px; }
+.lect-ending { line-height: 1.5; }
+.lect-read { margin-top: 6px; }
+.lect-read h3 { margin: 6px 0 3px; }
+.lect-text p { line-height: 1.65; margin: 0 0 4px; }
+.reader { line-height: 1.7; }
+.office-head small, .office-title { line-height: 1.3; }
 /* 아래 탭 글자가 큰 글씨 설정에서 서로 겹치지 않도록 */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .tabs a { min-width: 0; overflow: hidden; }
