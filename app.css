@@ -253,6 +253,30 @@ details.card > summary { padding: 10px 0; }
 }
 .lect-chip { padding: 1px 8px; line-height: 1.5; }
 .note-msg { white-space: nowrap; font-size: 13px; }
+/* ---------- 글 박스 상하 여백 최소화 ---------- */
+.office-tabs { padding: 3px; gap: 3px; }
+.office-tabs button { padding: 3px 2px; line-height: 1.25; }
+.office-tabs button small { margin-top: 0; }
+.office-tabs i { top: -5px; line-height: 14px; }
+.grid a { min-height: 0; padding: 5px 4px; line-height: 1.25; }
+.grid.chapters a, .grid.books a { min-height: 0; padding: 6px 2px; }
+.btn { height: auto; min-height: 30px; padding: 3px 12px; }
+.hero-link { padding: 6px 12px; }
+.today .row a { padding: 5px 6px; }
+.list li a, .list li > div.item { padding: 6px 4px; }
+details > summary, details.card > summary { padding: 7px 4px; }
+.links a.ext { padding: 6px 4px; }
+.hit { padding: 6px 4px; }
+.search-box input { height: 36px; }
+.chips button { height: 30px; }
+.org { padding: 5px 2px; }
+.ch { padding: 8px 10px; }
+.lect-nav button { height: 28px; min-width: 32px; }
+.lect-chip { padding: 0 7px; }
+.note-date input { height: 34px; padding: 2px 8px; }
+.note-ed textarea { padding: 8px 10px; }
+.card { padding: 9px 12px; margin-bottom: 8px; }
+.office-head { margin: 6px 0 3px; }
 /* 아래 탭 글자가 큰 글씨 설정에서 서로 겹치지 않도록 */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .tabs a { min-width: 0; overflow: hidden; }
