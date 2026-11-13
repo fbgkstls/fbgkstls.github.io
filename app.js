@@ -732,6 +732,16 @@
     var about = goAbout && document.getElementById("about");
     if (about) about.scrollIntoView(); else window.scrollTo(0, 0);
   }
+  // 아래 탭 이름이 칸을 넘치면(큰 글씨 설정 등) 짧은 이름으로 바꿈
+  function fitTabs() {
+    var spans = document.querySelectorAll(".tabs a span[data-short]");
+    Array.prototype.forEach.call(spans, function (s) { if (!s.dataset.full) s.dataset.full = s.textContent; s.textContent = s.dataset.full; });
+    var over = Array.prototype.some.call(spans, function (s) { return s.scrollWidth > s.clientWidth + 1; });
+    if (over) Array.prototype.forEach.call(spans, function (s) { s.textContent = s.dataset.short; });
+  }
+  fitTabs();
+  window.addEventListener("resize", fitTabs);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTabs);
   window.addEventListener("hashchange", route);
   applyPrefs();
   route();
