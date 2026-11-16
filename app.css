@@ -281,6 +281,21 @@ details > summary, details.card > summary { padding: 7px 4px; }
 .note-left { margin-right: auto; display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
 .note-left .note-msg { margin: 0; font-size: 12px; }
 .note-count.warn { color: var(--red); font-weight: 700; }
+/* 성가 2015 */
+.hy-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+.hy-bar input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; font-size: 15px; outline: none; }
+.hy-bar input:focus { border-color: var(--accent); }
+.hy-bar .btn { flex: none; height: 38px; }
+.hy-guide { margin: 4px 2px 8px; line-height: 1.55; }
+.hy-no { display: inline-block; min-width: 36px; color: var(--accent); }
+.hy-mk { margin-left: 4px; }
+.hy-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hy-big { font-size: 1.6em; color: var(--accent); margin-right: 8px; }
+.hy-t { font-weight: 800; font-size: 1.05em; }
+.hy-nav { display: flex; justify-content: space-between; gap: 6px; margin-top: 8px; }
+.hy-pages { display: flex; flex-direction: column; gap: 6px; }
+.hy-page { width: 100%; height: auto; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
+.hy-load { border: 2px solid var(--accent); }
 /* 줄 간격 좁히기 (날짜 · 교회력 · 전례색 · 본기도 · 독서) */
 .lect-top h2 { line-height: 1.3; }
 .lect-date { margin-top: 2px; line-height: 1.3; }

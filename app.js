@@ -491,21 +491,131 @@
     };
   }
   var HYMN_SITE ="https://dulkuka12.github.io/khymn/";
-  function hymn() {
-    setTop("성가 2015", false); setTab("hymn");
-    var h = secHead(4, "성가 2015", "성공회 성가 · 번호와 제목으로 찾기");
-    h += '<a class="hero-link" style="text-align:center;font-size:17px;padding:12px 14px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 찾기 열기 ↗</a>';
-    h += '<section class="card"><h2>사용 방법</h2><p style="margin:0;line-height:1.8">' +
-      "① 위 버튼을 누르면 「성가 2015」 화면이 열립니다.<br>" +
-      "② <b>성가 번호</b>(예: 125)나 <b>제목 단어</b>(예: 평화)를 입력하고 <b>Enter</b>를 누르세요.<br>" +
-      "③ ◀ ▶ 버튼으로 이전·다음 성가로 넘어갈 수 있습니다.<br>" +
-      "④ <b>📌 책갈피</b>에 오늘 부를 성가들을 미리 저장해 두면 예배 중에 바로 찾을 수 있습니다.<br>" +
-      "⑤ 다 보신 뒤에는 휴대폰 <b>뒤로 가기</b>를 누르면 이 앱으로 돌아옵니다.</p></section>";
-    h += '<section class="card"><h2>바로가기</h2><div class="btns" style="display:flex;flex-wrap:wrap;gap:8px">' +
-      '<a class="btn pri" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">성가 찾기</a>' +
-      '<a class="btn" href="' + HYMN_SITE + 'index.html" target="_blank" rel="noopener">처음 화면 · 사용 안내</a></div></section>';
-    h += '<p class="note">성가는 별도로 운영되는 「성가 2015」 웹앱(dulkuka12.github.io/khymn)에서 열립니다. 인터넷 연결이 필요합니다.</p>';
-    view.innerHTML = h;
+  // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
+  var HYMN_BY = {}; (window.HYMNS || []).forEach(function (x) { HYMN_BY[x[0]] = x; });
+  var hymnMarks = load("hymnMarks", []);
+  var hymnDoc = null, hymnDocP = null;
+  function idb() {
+    return new Promise(function (ok, no) {
+      try { var r = indexedDB.open("prayerbook", 1); r.onupgradeneeded = function () { r.result.createObjectStore("files"); }; r.onsuccess = function () { ok(r.result); }; r.onerror = function () { no(r.error); }; } catch (e) { no(e); }
+    });
+  }
+  function fileGet(k) { return idb().then(function (db) { return new Promise(function (ok, no) { var q = db.transaction("files").objectStore("files").get(k); q.onsuccess = function () { ok(q.result || null); }; q.onerror = function () { no(q.error); }; }); }); }
+  function filePut(k, v) { return idb().then(function (db) { return new Promise(function (ok, no) { var t = db.transaction("files", "readwrite"); t.objectStore("files").put(v, k); t.oncomplete = function () { ok(); }; t.onerror = function () { no(t.error); }; }); }); }
+  function fileDel(k) { return idb().then(function (db) { return new Promise(function (ok) { var t = db.transaction("files", "readwrite"); t.objectStore("files").delete(k); t.oncomplete = function () { ok(); }; t.onerror = function () { ok(); }; }); }); }
+  function loadPdfJs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    return new Promise(function (ok, no) {
+      var s = document.createElement("script"); s.src = "vendor/pdf.min.js";
+      s.onload = function () { pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.js"; ok(pdfjsLib); };
+      s.onerror = function () { no(new Error("pdf.js")); }; document.head.appendChild(s);
+    });
+  }
+  function openHymnDoc() {
+    if (hymnDoc) return Promise.resolve(hymnDoc);
+    if (hymnDocP) return hymnDocP;
+    hymnDocP = fileGet("hymnpdf").then(function (blob) {
+      if (!blob) return null;
+      return Promise.all([loadPdfJs(), blob.arrayBuffer()]).then(function (r) { return r[0].getDocument({ data: new Uint8Array(r[1]) }).promise; })
+        .then(function (d) { hymnDoc = d; return d; });
+    }).catch(function () { return null; }).then(function (d) { hymnDocP = null; return d; });
+    return hymnDocP;
+  }
+  function hymnTitle(x) { return (x[3] && x[3][0]) || ""; }
+  function hymnFind(q) {
+    q = String(q || "").trim(); if (!q) return [];
+    var m = /^(\d{1,3})(?:-\d)?$/.exec(q);
+    if (m) return HYMN_BY[+m[1]] ? [HYMN_BY[+m[1]]] : [];
+    var k = q.replace(/[\s,.!?·]/g, "");
+    return (window.HYMNS || []).filter(function (x) { return x[3].some(function (t) { return t.replace(/[\s,.!?·]/g, "").indexOf(k) >= 0; }); });
+  }
+  function hymnRow(x) {
+    var on = hymnMarks.indexOf(x[0]) >= 0;
+    return '<li><a href="#/hymn/' + x[0] + '"><b class="hy-no">' + x[0] + "</b>" + esc(hymnTitle(x)) +
+      (x[3].length > 1 ? '<span class="sub">' + esc(x[3].slice(1, 3).join(" · ")) + "</span>" : "") + (on ? '<span class="hy-mk">📌</span>' : "") + "</a></li>";
+  }
+  function hymnSearchBar(q) {
+    return '<div class="hy-bar"><input id="hq2" type="search" inputmode="search" placeholder="장 번호 또는 제목·첫 줄 (예: 125, 평화)" value="' + esc(q || "") + '" autocomplete="off">' +
+      '<button type="button" class="btn pri" id="hyGo">🔍 검색</button><a class="btn" href="#/hymn?bm=1">📌 책갈피' + (hymnMarks.length ? " " + hymnMarks.length : "") + "</a></div>" +
+      '<p class="note hy-guide">• <b>장 번호</b>(예: 125)를 넣으면 바로 그 성가가 열립니다.<br>• <b>제목이나 가사 첫 줄 낱말</b>(예: 평화, 주님의 사랑)로 찾으면 목록이 나옵니다.<br>• 성가 화면의 <b>📌</b>을 누르면 책갈피에 모여, 오늘 부를 성가를 예배 중에 바로 펼 수 있습니다.</p>';
+  }
+  function bindHymnBar() {
+    var inp = document.getElementById("hq2"), go = document.getElementById("hyGo");
+    function run() { var v = inp.value.trim(); if (!v) { inp.focus(); return; } var r = hymnFind(v); if (r.length === 1 && /^\d/.test(v)) location.hash = "#/hymn/" + r[0][0]; else location.hash = "#/hymn?q=" + encodeURIComponent(v); }
+    go.onclick = run; inp.addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+  }
+  function hymn(no, qs) {
+    qs = qs || {};
+    setTop("성가 2015", !!no); setTab("hymn");
+    if (no) return hymnView(+no);
+    var h = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기");
+    h += hymnSearchBar(qs.q);
+    var list = qs.bm ? hymnMarks.map(function (n) { return HYMN_BY[n]; }).filter(Boolean) : qs.q ? hymnFind(qs.q) : null;
+    if (qs.bm) h += '<section class="card"><h2>📌 책갈피 (' + list.length + ")</h2>" + (list.length ? '<ul class="list">' + list.map(hymnRow).join("") + "</ul>" +
+      '<button type="button" class="btn" id="hyClr" style="margin-top:6px">책갈피 모두 지우기</button>' : '<p class="note" style="margin:0">성가 화면에서 📌을 누르면 여기에 모입니다.</p>') + "</section>";
+    else if (list) h += '<section class="card"><h2>찾은 성가 (' + list.length + ")</h2>" + (list.length ? '<ul class="list">' + list.slice(0, 100).map(hymnRow).join("") + "</ul>" : '<p class="note" style="margin:0">찾는 성가가 없습니다. 다른 낱말로 찾아보세요.</p>') + "</section>";
+    h += '<div id="hyFile"></div>';
+    view.innerHTML = h; bindHymnBar();
+    var clr = document.getElementById("hyClr");
+    if (clr) clr.onclick = function () { if (confirm("책갈피를 모두 지울까요?")) { hymnMarks = []; save("hymnMarks", hymnMarks); hymn(null, { bm: 1 }); } };
+    fileGet("hymnpdf").then(function (b) { renderHymnFile(b); }).catch(function () { renderHymnFile(null); });
+  }
+  function renderHymnFile(blob) {
+    var box = document.getElementById("hyFile"); if (!box) return;
+    if (blob) {
+      box.innerHTML = '<section class="card"><h2>성가 파일</h2><p class="note" style="margin:0 0 6px">이 기기에 저장됨 · ' + (blob.size / 1048576).toFixed(1) + 'MB · 인터넷 없이 볼 수 있습니다.</p>' +
+        '<button type="button" class="btn" id="hyDel">이 기기에서 성가 파일 지우기</button></section>';
+      document.getElementById("hyDel").onclick = function () { if (!confirm("이 기기에 저장된 성가 파일을 지울까요? (책갈피는 남습니다)")) return; hymnDoc = null; fileDel("hymnpdf").then(function () { renderHymnFile(null); }); };
+      return;
+    }
+    box.innerHTML = '<section class="card hy-load"><h2>📂 성가 파일 불러오기 (처음 한 번)</h2>' +
+      '<p style="margin:0 0 6px">「성가 2015」 PDF 파일을 이 기기에 한 번 불러오면, 장 번호로 악보를 바로 펼쳐 볼 수 있습니다. 파일은 <b>이 기기 안에만</b> 저장되며 어디에도 전송되지 않습니다.</p>' +
+      '<label class="btn pri" style="cursor:pointer">PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label> <span id="hyMsg" class="note-msg"></span>' +
+      '<p class="note" style="margin:8px 0 0">파일이 없으신 분은 <a href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener" style="color:var(--accent)">「성가 2015」 웹앱 ↗</a>에서 보실 수 있습니다.</p></section>';
+    document.getElementById("hyFileIn").onchange = function () {
+      var f = this.files && this.files[0], msg = document.getElementById("hyMsg"); if (!f) return;
+      msg.textContent = "확인하는 중…";
+      loadPdfJs().then(function (lib) { return f.arrayBuffer().then(function (ab) { return lib.getDocument({ data: new Uint8Array(ab) }).promise; }); })
+        .then(function (d) {
+          if (d.numPages !== window.HYMN_PAGES) { msg.textContent = "「성가 2015」(" + window.HYMN_PAGES + "쪽) 파일이 아닙니다. (" + d.numPages + "쪽)"; return; }
+          msg.textContent = "저장하는 중…";
+          return filePut("hymnpdf", f).then(function () { hymnDoc = d; msg.textContent = "저장했습니다."; setTimeout(function () { renderHymnFile(f); }, 600); });
+        }).catch(function () { msg.textContent = "파일을 읽지 못했습니다. 저장 공간이 부족한지 확인해 주세요."; });
+    };
+  }
+  function hymnView(no) {
+    var x = HYMN_BY[no];
+    if (!x) { view.innerHTML = '<div class="empty">' + no + '장은 「성가 2015」에 없습니다.<br><br><a class="btn pri" href="#/hymn">성가 찾기로</a></div>'; return; }
+    var nums = (window.HYMNS || []).map(function (y) { return y[0]; }), i = nums.indexOf(no);
+    var prev = nums[i - 1], next = nums[i + 1], on = hymnMarks.indexOf(no) >= 0;
+    setTop(no + "장 · 성가 2015", true);
+    view.innerHTML = '<section class="card hy-head"><div class="hy-top"><div><b class="hy-big">' + no + '</b><span class="hy-t">' + esc(hymnTitle(x)) + "</span></div>" +
+      '<button type="button" class="btn' + (on ? " pri" : "") + '" id="hyMark">📌 ' + (on ? "책갈피됨" : "책갈피") + "</button></div>" +
+      (x[3].length > 1 ? '<div class="note" style="margin:2px 0 0">' + esc(x[3].slice(1).join(" · ")) + "</div>" : "") +
+      '<div class="hy-nav">' + (prev ? '<a class="btn" href="#/hymn/' + prev + '">◀ ' + prev + "장</a>" : "<span></span>") +
+      '<a class="btn" href="#/hymn">🔍 찾기</a>' + (next ? '<a class="btn" href="#/hymn/' + next + '">' + next + "장 ▶</a>" : "<span></span>") + "</div></section>" +
+      '<div id="hyPages" class="hy-pages"><p class="note" style="text-align:center">악보를 여는 중…</p></div>' +
+      '<p class="note" style="text-align:center">' + x[1] + (x[2] > x[1] ? "~" + x[2] : "") + "쪽 · 같은 쪽에 앞뒤 성가가 함께 실려 있을 수 있습니다.</p>";
+    document.getElementById("hyMark").onclick = function () {
+      var k = hymnMarks.indexOf(no); if (k >= 0) hymnMarks.splice(k, 1); else hymnMarks.push(no);
+      save("hymnMarks", hymnMarks); var b = this, o = k < 0; b.classList.toggle("pri", o); b.textContent = "📌 " + (o ? "책갈피됨" : "책갈피");
+    };
+    openHymnDoc().then(function (d) {
+      var box = document.getElementById("hyPages"); if (!box) return;
+      if (!d) { box.innerHTML = '<section class="card"><p style="margin:0 0 8px">이 기기에 성가 파일이 아직 없습니다.</p><a class="btn pri" href="#/hymn">성가 파일 불러오기</a> <a class="btn" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">웹앱에서 보기 ↗</a></section>'; return; }
+      box.innerHTML = "";
+      var W = Math.min(1600, Math.round(box.clientWidth * (window.devicePixelRatio || 1)));
+      (function draw(p) {
+        if (p > x[2] || !document.getElementById("hyPages")) return;
+        d.getPage(p).then(function (pg) {
+          var v0 = pg.getViewport({ scale: 1 }), v = pg.getViewport({ scale: W / v0.width });
+          var cv = document.createElement("canvas"); cv.width = v.width; cv.height = v.height; cv.className = "hy-page";
+          box.appendChild(cv);
+          var ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+          return pg.render({ canvasContext: ctx, viewport: v }).promise;
+        }).then(function () { draw(p + 1); });
+      })(x[1]);
+    });
   }
   function sites() {
     setTop("교구링크", false); setTab("sites");
@@ -734,7 +844,7 @@
     else if (path[0] === "church") church(qs.d, qs.q);
     else if (path[0] === "lect") bible();
     else if (path[0] === "sites") sites();
-    else if (path[0] === "hymn") hymn();
+    else if (path[0] === "hymn") hymn(path[1], qs);
     else if (path[0] === "note") noteView(path[1], qs.d, qs.q);
     else if (path[0] === "bible") bible(path[1]);
     else home();
