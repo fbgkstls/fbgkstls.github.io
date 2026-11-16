@@ -296,6 +296,8 @@ details > summary, details.card > summary { padding: 7px 4px; }
 .hy-pages { display: flex; flex-direction: column; gap: 6px; }
 .hy-page { width: 100%; height: auto; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
 .hy-load { border: 2px solid var(--accent); }
+.hy-mode { grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+.hy-mode button { padding: 6px 2px; font-size: 13.5px; }
 .hy-steps { margin: 0 0 8px; padding-left: 20px; font-size: 14px; line-height: 1.55; }
 .hy-steps li { margin: 2px 0; }
 /* 줄 간격 좁히기 (날짜 · 교회력 · 전례색 · 본기도 · 독서) */

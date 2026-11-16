@@ -539,6 +539,11 @@
       '<button type="button" class="btn pri" id="hyGo">🔍 검색</button><a class="btn" href="#/hymn?bm=1">📌 책갈피' + (hymnMarks.length ? " " + hymnMarks.length : "") + "</a></div>" +
       '<p class="note hy-guide">• <b>장 번호</b>(예: 125)를 넣으면 바로 그 성가가 열립니다.<br>• <b>제목이나 가사 첫 줄 낱말</b>(예: 평화, 주님의 사랑)로 찾으면 목록이 나옵니다.<br>• 성가 화면의 <b>📌</b>을 누르면 책갈피에 모여, 오늘 부를 성가를 예배 중에 바로 펼 수 있습니다.</p>';
   }
+  function bindHymnMode() {
+    Array.prototype.forEach.call(document.querySelectorAll(".hy-mode button"), function (b) {
+      b.onclick = function () { prefs.hymnMode = b.dataset.hm; save("prefs", prefs); hymn(null, {}); };
+    });
+  }
   function bindHymnBar() {
     var inp = document.getElementById("hq2"), go = document.getElementById("hyGo");
     function run() { var v = inp.value.trim(); if (!v) { inp.focus(); return; } var r = hymnFind(v); if (r.length === 1 && /^\d/.test(v)) location.hash = "#/hymn/" + r[0][0]; else location.hash = "#/hymn?q=" + encodeURIComponent(v); }
@@ -562,14 +567,25 @@
     }
     setTop("성가 2015", !!no); setTab("hymn");
     if (no) return hymnView(+no);
+    var mode = qs.m || prefs.hymnMode || "file";
+    if (qs.m) { prefs.hymnMode = qs.m; save("prefs", prefs); }
     var h = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기");
+    h += '<div class="office-tabs hy-mode"><button type="button" data-hm="file" class="' + (mode === "file" ? "on" : "") + '">① 성가 파일로 보기</button>' +
+      '<button type="button" data-hm="web" class="' + (mode === "web" ? "on" : "") + '">② 성가 2015 웹앱</button></div>';
+    if (mode === "web") {
+      h += '<section class="card"><h2>「성가 2015」 웹앱으로 찾기</h2>' +
+        '<p style="margin:0 0 8px">성가 파일이 없어도, 별도로 운영되는 「성가 2015」 웹앱에서 번호나 제목으로 성가를 찾아볼 수 있습니다. (인터넷 필요)</p>' +
+        '<a class="hero-link" style="text-align:center;font-size:16px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 웹앱 열기 ↗</a>' +
+        '<p class="note hy-guide" style="margin:6px 2px 0">• 웹앱에서 <b>성가 번호</b>(예: 125)나 <b>제목 단어</b>를 넣고 <b>Enter</b>를 누르세요.<br>• ◀ ▶ 버튼으로 이전·다음 성가로 넘어갑니다.<br>• 다 보신 뒤 휴대폰 <b>뒤로 가기</b>를 누르면 이 앱으로 돌아옵니다.<br>• 이 앱의 성가집과 쪽 구성·내용이 조금 다를 수 있습니다.</p></section>';
+      view.innerHTML = h; bindHymnMode(); return;
+    }
     h += hymnSearchBar(qs.q);
     var list = qs.bm ? hymnMarks.map(function (n) { return HYMN_BY[n]; }).filter(Boolean) : qs.q ? hymnFind(qs.q) : null;
     if (qs.bm) h += '<section class="card"><h2>📌 책갈피 (' + list.length + ")</h2>" + (list.length ? '<ul class="list">' + list.map(hymnRow).join("") + "</ul>" +
       '<button type="button" class="btn" id="hyClr" style="margin-top:6px">책갈피 모두 지우기</button>' : '<p class="note" style="margin:0">성가 화면에서 📌을 누르면 여기에 모입니다.</p>') + "</section>";
     else if (list) h += '<section class="card"><h2>찾은 성가 (' + list.length + ")</h2>" + (list.length ? '<ul class="list">' + list.slice(0, 100).map(hymnRow).join("") + "</ul>" : '<p class="note" style="margin:0">찾는 성가가 없습니다. 다른 낱말로 찾아보세요.</p>') + "</section>";
     h += '<div id="hyFile"></div>';
-    view.innerHTML = h; bindHymnBar();
+    view.innerHTML = h; bindHymnBar(); bindHymnMode();
     var clr = document.getElementById("hyClr");
     if (clr) clr.onclick = function () { if (confirm("책갈피를 모두 지울까요?")) { hymnMarks = []; save("hymnMarks", hymnMarks); hymn(null, { bm: 1 }); } };
     fileGet("hymnpdf").then(function (b) { renderHymnFile(b); }).catch(function () { renderHymnFile(null); });
