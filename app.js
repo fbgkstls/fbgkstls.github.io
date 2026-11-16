@@ -570,8 +570,15 @@
     }
     box.innerHTML = '<section class="card hy-load"><h2>📂 성가 파일 불러오기 (처음 한 번)</h2>' +
       '<p style="margin:0 0 6px">「성가 2015」 PDF 파일을 이 기기에 한 번 불러오면, 장 번호로 악보를 바로 펼쳐 볼 수 있습니다. 파일은 <b>이 기기 안에만</b> 저장되며 어디에도 전송되지 않습니다.</p>' +
-      '<label class="btn pri" style="cursor:pointer">PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label> <span id="hyMsg" class="note-msg"></span>' +
-      '<p class="note" style="margin:8px 0 0">파일이 없으신 분은 <a href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener" style="color:var(--accent)">「성가 2015」 웹앱 ↗</a>에서 보실 수 있습니다.</p></section>';
+      (window.HYMN_FILE_URL ?
+        '<ol class="hy-steps"><li><b>[① 악보 파일 받기]</b>를 눌러 구글 드라이브에서 <b>다운로드</b>합니다. (초대받은 구글 계정으로 로그인)</li>' +
+        '<li>앱으로 돌아와 <b>[② PDF 파일 고르기]</b> → <b>다운로드(Download)</b> 폴더의 「성가 2015 (경량).pdf」를 고릅니다.</li>' +
+        '<li>"저장했습니다"가 나오면 끝. 다운로드한 파일은 지워도 됩니다.</li></ol>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"><a class="btn" href="' + esc(window.HYMN_FILE_URL) + '" target="_blank" rel="noopener">① 악보 파일 받기 ↗</a>' +
+        '<label class="btn pri" style="cursor:pointer">② PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label> <span id="hyMsg" class="note-msg"></span></div>' +
+        '<p class="note" style="margin:8px 0 0">지금은 <b>테스트용</b>으로 초대된 분만 받을 수 있습니다. 받을 수 없으면 앱 관리자에게 문의해 주세요.</p>'
+        : '<label class="btn pri" style="cursor:pointer">PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label> <span id="hyMsg" class="note-msg"></span>') +
+      "</section>";
     document.getElementById("hyFileIn").onchange = function () {
       var f = this.files && this.files[0], msg = document.getElementById("hyMsg"); if (!f) return;
       msg.textContent = "확인하는 중…";
