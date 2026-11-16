@@ -546,6 +546,20 @@
   }
   function hymn(no, qs) {
     qs = qs || {};
+    // 테스터용 링크(#/hymn?key=암호): 암호를 입력하지 않아도 자동으로 풀고, 주소에서 암호를 지움
+    if (qs.key && window.HYMN_LOCKED) {
+      var key = qs.key;
+      try { history.replaceState(null, "", location.pathname + location.search + "#/hymn"); } catch (e) {}
+      setTop("성가 2015", false); setTab("hymn");
+      view.innerHTML = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기") +
+        '<section class="card hy-load"><h2>🎵 성가 악보 준비 중</h2><p id="hyAuto" style="margin:0">잠시만 기다려 주세요…</p></section>';
+      fileGet("hymnpdf").then(function (have) {
+        if (have) return have;
+        return hymnUnlock(key, function (t) { var el = document.getElementById("hyAuto"); if (el) el.textContent = t; });
+      }).then(function () { hymnDoc = null; hymn(null, {}); })
+        .catch(function (e) { var el = document.getElementById("hyAuto"); if (el) el.textContent = e && e.message === "pw" ? "링크가 더 이상 쓸 수 없습니다. 관리자에게 문의해 주세요." : "불러오지 못했습니다. 인터넷 연결을 확인하고 링크를 다시 눌러 주세요."; });
+      return;
+    }
     setTop("성가 2015", !!no); setTab("hymn");
     if (no) return hymnView(+no);
     var h = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기");
@@ -568,6 +582,30 @@
       document.getElementById("hyDel").onclick = function () { if (!confirm("이 기기에 저장된 성가 파일을 지울까요? (책갈피는 남습니다)")) return; hymnDoc = null; fileDel("hymnpdf").then(function () { renderHymnFile(null); }); };
       return;
     }
+    if (window.HYMN_LOCKED) {
+      box.innerHTML = '<section class="card hy-load"><h2>🔒 성가 악보 열기 (테스터용)</h2>' +
+        '<p style="margin:0 0 6px">관리자에게 받은 <b>암호</b>를 처음 한 번만 넣으면, 악보가 이 기기에 저장되어 장 번호로 바로 펼쳐 볼 수 있습니다. (약 19MB · 와이파이 권장)</p>' +
+        '<div class="hy-bar"><input id="hyPw" type="password" autocomplete="off" placeholder="암호 입력"><button type="button" class="btn pri" id="hyUnlock">열기</button></div>' +
+        '<span id="hyMsg" class="note-msg"></span>' +
+        '<details style="margin-top:6px"><summary class="note" style="padding:4px 0">PDF 파일을 직접 갖고 계신가요?</summary>' +
+        '<label class="btn" style="cursor:pointer">PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label></details>' +
+        '<p class="note" style="margin:6px 0 0">지금은 <b>테스트용</b>입니다. 암호는 앱 관리자에게 문의해 주세요.</p></section>';
+      var pwIn = document.getElementById("hyPw"), pmsg = document.getElementById("hyMsg");
+      var go = function () {
+        var pw = pwIn.value.trim(); if (!pw) { pwIn.focus(); return; }
+        document.getElementById("hyUnlock").disabled = true;
+        hymnUnlock(pw, function (t) { pmsg.textContent = t; }).then(function (blob) {
+          pmsg.textContent = "저장했습니다."; hymnDoc = null; setTimeout(function () { renderHymnFile(blob); }, 600);
+        }).catch(function (e) {
+          pmsg.textContent = e && e.message === "pw" ? "암호가 맞지 않습니다." : "불러오지 못했습니다. 인터넷 연결과 저장 공간을 확인해 주세요.";
+          var b = document.getElementById("hyUnlock"); if (b) b.disabled = false;
+        });
+      };
+      document.getElementById("hyUnlock").onclick = go;
+      pwIn.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+      bindHymnPick();
+      return;
+    }
     box.innerHTML = '<section class="card hy-load"><h2>📂 성가 파일 불러오기 (처음 한 번)</h2>' +
       '<p style="margin:0 0 6px">「성가 2015」 PDF 파일을 이 기기에 한 번 불러오면, 장 번호로 악보를 바로 펼쳐 볼 수 있습니다. 파일은 <b>이 기기 안에만</b> 저장되며 어디에도 전송되지 않습니다.</p>' +
       (window.HYMN_FILE_URL ?
@@ -579,7 +617,39 @@
         '<p class="note" style="margin:8px 0 0">지금은 <b>테스트용</b>으로 초대된 분만 받을 수 있습니다. 받을 수 없으면 앱 관리자에게 문의해 주세요.</p>'
         : '<label class="btn pri" style="cursor:pointer">PDF 파일 고르기<input type="file" id="hyFileIn" accept="application/pdf,.pdf" hidden></label> <span id="hyMsg" class="note-msg"></span>') +
       "</section>";
-    document.getElementById("hyFileIn").onchange = function () {
+    bindHymnPick();
+  }
+  // 암호로 잠긴 hymns.bin 을 받아 풀고 이 기기에 저장 (형식은 tools/encrypt-hymns.ps1 참고)
+  function hymnUnlock(pw, say) {
+    var S = crypto.subtle, enc = new TextEncoder();
+    say("받는 중… (약 19MB)");
+    return fetch("hymns.bin").then(function (r) { if (!r.ok) throw new Error("net"); return r.arrayBuffer(); }).then(function (ab) {
+      var u = new Uint8Array(ab);
+      if (String.fromCharCode(u[0], u[1], u[2], u[3]) !== "PBH1") throw new Error("fmt");
+      var salt = u.slice(4, 20), iv = u.slice(20, 36), body = u.subarray(4, u.length - 32), ct = u.subarray(36, u.length - 32), tag = u.slice(u.length - 32);
+      say("암호 확인 중…");
+      return S.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveBits"])
+        .then(function (k) { return S.deriveBits({ name: "PBKDF2", salt: salt, iterations: 200000, hash: "SHA-256" }, k, 512); })
+        .then(function (bits) {
+          var kb = new Uint8Array(bits);
+          return Promise.all([S.importKey("raw", kb.slice(0, 32), { name: "AES-CBC" }, false, ["decrypt"]),
+            S.importKey("raw", kb.slice(32, 64), { name: "HMAC", hash: "SHA-256" }, false, ["verify"])]);
+        }).then(function (keys) {
+          return S.verify("HMAC", keys[1], tag, body).then(function (ok) {
+            if (!ok) throw new Error("pw");
+            say("푸는 중…");
+            return S.decrypt({ name: "AES-CBC", iv: iv }, keys[0], ct);
+          });
+        });
+    }).then(function (plain) {
+      var blob = new Blob([plain], { type: "application/pdf" });
+      say("저장하는 중…");
+      return filePut("hymnpdf", blob).then(function () { return blob; });
+    });
+  }
+  function bindHymnPick() {
+    var fin = document.getElementById("hyFileIn"); if (!fin) return;
+    fin.onchange = function () {
       var f = this.files && this.files[0], msg = document.getElementById("hyMsg"); if (!f) return;
       msg.textContent = "확인하는 중…";
       loadPdfJs().then(function (lib) { return f.arrayBuffer().then(function (ab) { return lib.getDocument({ data: new Uint8Array(ab) }).promise; }); })
