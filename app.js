@@ -574,11 +574,11 @@
       '<button type="button" data-hm="web" class="' + (mode === "web" ? "on" : "") + '">② 성가 2015 웹앱</button></div>';
     if (mode === "web") {
       h += '<section class="card"><h2>「성가 2015」 웹앱으로 찾기</h2>' +
-        '<p style="margin:0 0 8px">성가 파일이 없어도, 별도로 운영되는 「성가 2015」 웹앱에서 번호나 제목으로 성가를 찾아볼 수 있습니다. (인터넷 필요)</p>' +
+        '<p style="margin:0 0 8px">성가 파일이 없어도, 별도로 운영되는 「성가 2015」 웹앱에서 번호나 제목으로 성가를 찾아볼 수 있습니다. (인터넷 연결 필요)</p>' +
         '<a class="hero-link" style="text-align:center;font-size:16px" href="' + HYMN_SITE + 'searchhymn.html" target="_blank" rel="noopener">🎵 성가 2015 웹앱 열기 ↗</a>' +
         '<p class="note hy-guide" style="margin:6px 2px 0">• 웹앱에서 <b>성가 번호</b>(예: 125)나 <b>제목 단어</b>를 넣고 <b>Enter</b>를 누르세요.<br>• ◀ ▶ 버튼으로 이전·다음 성가로 넘어갑니다.<br>• 다 보신 뒤 휴대폰 <b>뒤로 가기</b>를 누르면 이 앱으로 돌아옵니다.<br>• 이 앱의 성가집과 쪽 구성·내용이 조금 다를 수 있습니다.</p>' +
         '<div class="hy-src"><b>출처 · 제공 경로</b><br>' +
-        '• 출처: 「성가 2015」 웹앱 — <a href="' + HYMN_SITE + '" target="_blank" rel="noopener">dulkuka12.github.io/khymn</a> · <b>장창경 신부님 제작</b><br>' +
+        '• 출처: 「성가 2015」 웹앱 — <a href="' + HYMN_SITE + '" target="_blank" rel="noopener">dulkuka12.github.io/khymn</a> · <b>장창경 신부님 제작</b> (인터넷 연결 필요)<br>' +
         '• 원본 성가집: 대한성공회 「성가 2015」 (대한성공회출판부 발행)<br>' +
         '• 제공 경로: 이 앱은 해당 웹앱으로 <b>링크만 연결</b>하며, 웹앱의 내용을 이 앱에 저장하거나 고치지 않습니다. 내용 문의는 해당 웹앱 운영자에게 해 주세요.</div></section>';
       view.innerHTML = h; bindHymnMode(); return;
