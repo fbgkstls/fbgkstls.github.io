@@ -491,6 +491,23 @@
     };
   }
   var HYMN_SITE ="https://dulkuka12.github.io/khymn/";
+  // ---------- 영성센터 (대한성공회 영성센터 페이스북: 매일 아침 오늘의 복음과 묵상) ----------
+  var SOUL_FB = "https://www.facebook.com/soulfriend21";
+  function soul() {
+    setTop("영성센터", false); setTab("soul");
+    var d = new Date(), wd = "일월화수목금토";
+    var h = secHead(4, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
+    h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
+      '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
+      '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 아래 버튼을 누르면 맨 위에 오늘 글이 있습니다.</p>' +
+      '<a class="hero-link" style="text-align:center;font-size:16px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 오늘의 묵상 보기 (페이스북) ↗</a>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><a class="btn" href="http://cafe.daum.net/soulfriend21" target="_blank" rel="noopener">영성센터 카페 ↗</a>' +
+      '<a class="btn" href="#/bible">오늘의 말씀 (공동번역성서)</a><a class="btn" href="#/note">✍ 묵상 기록하기</a></div></section>';
+    h += '<section class="card"><h2>이렇게 써 보세요</h2><p class="note hy-guide" style="margin:0">• 아침에 영성센터 묵상을 읽고, <b>공동번역성서</b> 탭에서 오늘의 독서를 함께 읽습니다.<br>• 마음에 머문 구절과 느낌은 <b>묵상기록</b>에 적어 둡니다.<br>• 페이스북 앱이 있으면 앱으로, 없으면 브라우저로 열립니다. 로그인하지 않아도 볼 수 있습니다.</p></section>';
+    h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21 · cafe.daum.net/soulfriend21) (인터넷 연결 필요)<br>' +
+      '• 제공 경로: 이 앱은 영성센터 페이스북으로 <b>링크만 연결</b>하며, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
+    view.innerHTML = h;
+  }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
   var HYMN_BY = {}; (window.HYMNS || []).forEach(function (x) { HYMN_BY[x[0]] = x; });
   var hymnMarks = load("hymnMarks", []);
@@ -556,7 +573,7 @@
       var key = qs.key;
       try { history.replaceState(null, "", location.pathname + location.search + "#/hymn"); } catch (e) {}
       setTop("성가 2015", false); setTab("hymn");
-      view.innerHTML = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기") +
+      view.innerHTML = secHead(5, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기") +
         '<section class="card hy-load"><h2>🎵 성가 악보 준비 중</h2><p id="hyAuto" style="margin:0">잠시만 기다려 주세요…</p></section>';
       fileGet("hymnpdf").then(function (have) {
         if (have) return have;
@@ -569,7 +586,7 @@
     if (no) return hymnView(+no);
     var mode = qs.m || prefs.hymnMode || "file";
     if (qs.m) { prefs.hymnMode = qs.m; save("prefs", prefs); }
-    var h = secHead(4, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기");
+    var h = secHead(5, "성가 2015", "성공회 성가 · 장 번호와 제목으로 찾기");
     h += '<div class="office-tabs hy-mode"><button type="button" data-hm="file" class="' + (mode === "file" ? "on" : "") + '">① 성가 파일로 보기</button>' +
       '<button type="button" data-hm="web" class="' + (mode === "web" ? "on" : "") + '">② 성가 2015 웹앱</button></div>';
     if (mode === "web") {
@@ -716,7 +733,7 @@
   }
   function sites() {
     setTop("교구링크", false); setTab("sites");
-    var h = secHead(6, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
+    var h = secHead(7, "교구링크", "서울교구 홈페이지와 관련 사이트 바로가기");
     h += '<a class="hero-link" href="https://seoul.anglican.kr/" target="_blank" rel="noopener">대한성공회 서울교구 홈페이지 ↗</a>';
     var groups = [];
     window.SEOUL_SITES.forEach(function (s) { if (groups.indexOf(s[0]) < 0) groups.push(s[0]); });
@@ -866,7 +883,7 @@
     setTop("교회찾기", false); setTab("church");
     dio = dio || load("dio", "seoul");
     var D = window.DIOCESES.filter(function (d) { return d.id !== "province"; });
-    var h = secHead(5, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
+    var h = secHead(6, "교회찾기", "서울교구 조직 연락처 · 교구별 교회 주소록");
     h += '<details class="card" style="padding:0 16px"><summary>서울교구 조직 (' + window.SEOUL_ORG.length + "개 부서)</summary>" +
       window.SEOUL_ORG.map(function (o) {
         return '<div class="org"><b>' + esc(o[0]) + "</b><span>" + esc(o[1]) + "</span>" + (o[4] ? "<span>" + esc(o[4]) + "</span>" : "") +
@@ -942,6 +959,7 @@
     else if (path[0] === "lect") bible();
     else if (path[0] === "sites") sites();
     else if (path[0] === "hymn") hymn(path[1], qs);
+    else if (path[0] === "soul") soul();
     else if (path[0] === "note") noteView(path[1], qs.d, qs.q);
     else if (path[0] === "bible") bible(path[1]);
     else home();
