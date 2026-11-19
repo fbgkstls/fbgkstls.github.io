@@ -391,7 +391,7 @@
     var info = n ? { day: n.day, refs: n.refs || [] } : lectInfo(key);
     var draft = !n ? (load("noteDraft", null) || {}) : {};
     var text = n ? n.text : (draft.date === key ? draft.text : "");
-    var h = id ? "" : secHead(3, "묵상기록", "독서와 기도로 얻은 느낌과 감상을 적어 둡니다");
+    var h = id ? "" : secHead(4, "묵상기록", "독서와 기도로 얻은 느낌과 감상을 적어 둡니다");
     h += '<section class="card note-ed"><div class="note-date"><input type="date" id="nDate" value="' + key + '"' + (n ? " disabled" : "") + '>' +
       '<span id="nDay">' + esc(info.day || "") + "</span></div>" +
       '<div class="note-refs" id="nRefs">' + info.refs.map(function (r) { return '<span class="lect-chip">' + esc(r) + "</span>"; }).join("") + "</div>" +
@@ -496,7 +496,7 @@
   function soul() {
     setTop("영성센터", false); setTab("soul");
     var d = new Date(), wd = "일월화수목금토";
-    var h = secHead(4, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
+    var h = secHead(3, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
     h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
       '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
       '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 오늘 글을 아래에 펼쳐 보여 드립니다.</p>' +

@@ -1,5 +1,5 @@
 // Offline cache. Bump VERSION whenever any file changes (e.g. after update-content.ps1).
-var VERSION = "v2026-11-19c";
+var VERSION = "v2026-11-19d";
 var FILES = [
   "./", "./index.html", "./hymns.js", "./vendor/pdf.min.js", "./vendor/pdf.worker.min.js", "./note-guide.html", "./privacy.html", "./app.css", "./app.js", "./menu.js", "./content.js", "./lect.js", "./churches.js", "./bible.js",
   "./manifest.webmanifest", "./icons/emblem.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png"
@@ -14,7 +14,7 @@ self.addEventListener("activate", function (e) {
 });
 self.addEventListener("fetch", function (e) {
   if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return;
-  if (/\/soul\.json$/.test(new URL(e.request.url).pathname)) return; // 오늘의 묵상 링크는 항상 새로 받음
+  if (/\/soul\.json$/.test(new URL(e.request.url).pathname)) return; // ?ㅻ뒛??臾듭긽 留곹겕????긽 ?덈줈 諛쏆쓬
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(function (hit) {
     return hit || fetch(e.request).then(function (res) {
       var copy = res.clone();
