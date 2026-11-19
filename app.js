@@ -502,9 +502,17 @@
       '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 오늘 글을 아래에 펼쳐 보여 드립니다.</p>' +
       '<div id="soulPost"></div>' +
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
+    h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
+      '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
+      '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
+      '<li>위 글 상자를 <b>아래로 내려가며</b> 읽으세요. 글이 길면 끝에 <b>「… 더 보기」</b>가 나오는데, 누르면 페이스북에서 <b>전문</b>이 열립니다.</li>' +
+      '<li>페이스북 <b>회원이 아니어도, 로그인하지 않아도</b> 볼 수 있습니다. 로그인 창이 뜨면 ✕나 「나중에」를 누르세요.</li>' +
+      '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
+      '<li>인터넷이 연결되어 있어야 보입니다.</li></ol></details>';
     h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21) (인터넷 연결 필요)<br>' +
       '• 제공 경로: 페이스북이 제공하는 공식 게시물 보기 기능으로 <b>그대로 보여 주며</b>, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
     view.innerHTML = h;
+    var sg = view.querySelector(".soul-guide"); if (sg) sg.addEventListener("toggle", function () { if (!sg.open) save("soulSeen", true); });
     // soul.json: {"date":"YYYY-MM-DD","url":"오늘 게시물 주소"} — 날짜가 오늘이면 그 게시물을 펼쳐 보여 줌
     fetch("soul.json?d=" + ymd(d), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (j) {
       var box = document.getElementById("soulPost"); if (!box) return;
