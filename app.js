@@ -499,14 +499,23 @@
     var h = secHead(4, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
     h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
       '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
-      '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 아래 버튼을 누르면 맨 위에 오늘 글이 있습니다.</p>' +
-      '<a class="hero-link" style="text-align:center;font-size:16px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 오늘의 묵상 보기 (페이스북) ↗</a>' +
-      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><a class="btn" href="http://cafe.daum.net/soulfriend21" target="_blank" rel="noopener">영성센터 카페 ↗</a>' +
-      '<a class="btn" href="#/bible">오늘의 말씀 (공동번역성서)</a><a class="btn" href="#/note">✍ 묵상 기록하기</a></div></section>';
-    h += '<section class="card"><h2>이렇게 써 보세요</h2><p class="note hy-guide" style="margin:0">• 아침에 영성센터 묵상을 읽고, <b>공동번역성서</b> 탭에서 오늘의 독서를 함께 읽습니다.<br>• 마음에 머문 구절과 느낌은 <b>묵상기록</b>에 적어 둡니다.<br>• 페이스북 앱이 있으면 앱으로, 없으면 브라우저로 열립니다. 로그인하지 않아도 볼 수 있습니다.</p></section>';
-    h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21 · cafe.daum.net/soulfriend21) (인터넷 연결 필요)<br>' +
-      '• 제공 경로: 이 앱은 영성센터 페이스북으로 <b>링크만 연결</b>하며, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
+      '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 오늘 글을 아래에 펼쳐 보여 드립니다.</p>' +
+      '<div id="soulPost"></div>' +
+      '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
+    h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21) (인터넷 연결 필요)<br>' +
+      '• 제공 경로: 페이스북이 제공하는 공식 게시물 보기 기능으로 <b>그대로 보여 주며</b>, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
     view.innerHTML = h;
+    // soul.json: {"date":"YYYY-MM-DD","url":"오늘 게시물 주소"} — 날짜가 오늘이면 그 게시물을 펼쳐 보여 줌
+    fetch("soul.json?d=" + ymd(d), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (j) {
+      var box = document.getElementById("soulPost"); if (!box) return;
+      if (!j || !j.url || !/^https:\/\/www\.facebook\.com\//.test(j.url)) { box.innerHTML = '<p class="note" style="margin:4px 0">오늘 글은 아래 버튼을 눌러 보세요.</p>'; return; }
+      var today = j.date === ymd(d);
+      var w = Math.max(280, Math.min(500, box.clientWidth || 340));
+      box.innerHTML = (today ? "" : '<p class="note" style="margin:4px 0">오늘 글이 아직 연결되지 않아 가장 최근 글(' + esc(j.date) + ')을 보여 드립니다.</p>') +
+        '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
+        'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
+      var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
+    });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
   var HYMN_BY = {}; (window.HYMNS || []).forEach(function (x) { HYMN_BY[x[0]] = x; });
