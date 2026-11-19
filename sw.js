@@ -14,7 +14,7 @@ self.addEventListener("activate", function (e) {
 });
 self.addEventListener("fetch", function (e) {
   if (e.request.method !== "GET" || new URL(e.request.url).origin !== location.origin) return;
-  if (/\/soul\.json$/.test(new URL(e.request.url).pathname)) return; // ?ㅻ뒛??臾듭긽 留곹겕????긽 ?덈줈 諛쏆쓬
+  if (/\/soul\.json$/.test(new URL(e.request.url).pathname)) return; // always fetch today's reflection link fresh
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(function (hit) {
     return hit || fetch(e.request).then(function (res) {
       var copy = res.clone();
