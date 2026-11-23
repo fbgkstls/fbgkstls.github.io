@@ -502,10 +502,9 @@
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
     h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
       '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
-      '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
-      '<li>위 글 상자에서 <b>복음 말씀</b>과 <b>오늘의 말씀</b>을 바로 읽을 수 있습니다.</li>' +
-      '<li>묵상과 기도까지 <b>전문</b>을 보려면 글 상자(「더 보기」 포함)나 아래 <b>「📖 영성센터에서 오늘 말씀 전문 보기」</b>를 누르세요. <b>그날 글이 바로</b> 열립니다.<br>' +
-      '· <b>휴대폰</b>: <b>페이스북 앱</b>에서 열립니다. 로그인되어 있으면 「더 보기」를 눌러 전문을 볼 수 있습니다. 페이스북 앱이 없으면 인터넷 창에서 열리며 로그인이 필요할 수 있습니다.<br>' +
+      '<ol class="hy-steps"><li>매일 아침 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
+      '<li>위 글 상자에서 보이지 않는 <b>묵상과 기도까지 전문</b>을 보시려면 글 상자(「더 보기」 포함)나 아래 <b>「📖 영성센터에서 전문보기」</b>를 누르세요.<br>' +
+      '· <b>휴대폰</b>: <b>페이스북 앱</b>에서 열립니다. 페이스북 앱이 없으면 인터넷 창에서 열리며 로그인이 필요할 수 있습니다.<br>' +
       '· <b>PC</b>: 로그인 창이 뜨면 <b>✕</b>를 누르면 전문이 보입니다.</li>' +
       '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
       '<li>인터넷이 연결되어 있어야 보입니다.</li></ol></details>';
@@ -555,7 +554,7 @@
         '<a class="soul-cover" href="' + esc(direct) + '" aria-label="영성센터에서 오늘 말씀 전문 보기"></a></div>';
       box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자(「더 보기」 포함)나 아래 버튼을 누르면 <b>페이스북 앱</b>에서 오늘 말씀이 열립니다. 로그인되어 있으면 「더 보기」로 전문을 볼 수 있습니다.</p>');
       // 그날 글로 바로: 휴대폰에서도 첫 화면이 아니라 해당 게시물이 열리도록 모바일 주소 사용
-      var b = document.getElementById("soulBtn"); if (b) { b.href = direct; b.removeAttribute("target"); b.textContent = "📖 영성센터에서 오늘 말씀 전문 보기 ↗"; }
+      var b = document.getElementById("soulBtn"); if (b) { b.href = direct; b.removeAttribute("target"); b.textContent = "📖 영성센터에서 전문보기 ↗"; }
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
