@@ -510,7 +510,8 @@
       '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
       '<li>인터넷이 연결되어 있어야 보입니다.</li></ol></details>';
     h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21) (인터넷 연결 필요)<br>' +
-      '• 제공 경로: 페이스북이 제공하는 공식 게시물 보기 기능으로 <b>그대로 보여 주며</b>, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
+      '• 제공 경로: 페이스북이 제공하는 공식 게시물 보기 기능으로 <b>그대로 보여 주며</b>, 글을 이 앱에 저장하거나 고치지 않습니다.<br>' +
+      '<span style="opacity:.7">화면 버전 W-1123</span></div>';
     view.innerHTML = h;
     var sg = view.querySelector(".soul-guide"); if (sg) sg.addEventListener("toggle", function () { if (!sg.open) save("soulSeen", true); });
     // soul.json: {"date":"YYYY-MM-DD","url":"오늘 게시물 주소"} — 날짜가 오늘이면 그 게시물을 펼쳐 보여 줌
