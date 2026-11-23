@@ -297,6 +297,11 @@ details > summary, details.card > summary { padding: 7px 4px; }
 .hy-page { width: 100%; height: auto; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
 .hy-load { border: 2px solid var(--accent); }
 .hy-mode { grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+.soul-text { font-size: calc(16px * var(--fs)); line-height: 1.75; word-break: keep-all; }
+.soul-text p { margin: 0 0 7px; }
+.soul-h { font-size: 15px; color: var(--accent); margin: 12px 0 4px; }
+.soul-text .soul-h:first-child { margin-top: 6px; color: var(--blue); }
+.lect-nav button:disabled { opacity: .35; cursor: default; }
 .soul-guide > summary { font-size: 14px; font-weight: 700; color: var(--accent); padding: 4px 0; }
 .soul-guide p { font-size: 14px; line-height: 1.6; }
 .hy-src { margin-top: 8px; padding: 7px 10px; border-radius: 10px; background: var(--surface2); font-size: 12px; line-height: 1.6; color: var(--muted); }

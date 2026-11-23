@@ -493,36 +493,56 @@
   var HYMN_SITE ="https://dulkuka12.github.io/khymn/";
   // ---------- 영성센터 (대한성공회 영성센터 페이스북: 매일 아침 오늘의 복음과 묵상) ----------
   var SOUL_FB = "https://www.facebook.com/soulfriend21";
+  // soul.json: {items:[{date,url,text}]} 최신순. 영성센터 사용 허락(2026-11-21, 김문영 신부님)에 따라 전문을 실음.
+  // 마지막으로 받은 내용은 기기에 저장해 두어 인터넷 없이도 볼 수 있음.
+  var soulData = load("soulData", null), soulIdx = 0;
+  function soulText(t) {
+    return String(t || "").split(/\n+/).map(function (line) {
+      line = line.trim(); if (!line) return "";
+      var m = /^■\s*(.*)$/.exec(line);
+      return m ? '<h3 class="soul-h">' + esc(m[1]) + "</h3>" : "<p>" + esc(line) + "</p>";
+    }).join("");
+  }
+  function soulDate(k) { var p = k.split("-"), x = new Date(+p[0], +p[1] - 1, +p[2]); return (+p[1]) + "월 " + (+p[2]) + "일 (" + "일월화수목금토"[x.getDay()] + ")"; }
+  function soulRender() {
+    var box = document.getElementById("soulPost"); if (!box) return;
+    var items = (soulData && soulData.items) || [];
+    if (!items.length) { box.innerHTML = '<p class="note" style="margin:4px 0">' + (navigator.onLine === false ? "인터넷에 연결되면 오늘의 묵상이 보입니다." : "묵상을 불러오는 중…") + "</p>"; return; }
+    if (soulIdx >= items.length) soulIdx = 0;
+    var it = items[soulIdx], today = ymd(new Date());
+    document.getElementById("soulDay").textContent = soulDate(it.date) + (it.date === today ? " · 오늘" : "");
+    document.getElementById("soulPrev").disabled = soulIdx >= items.length - 1;
+    document.getElementById("soulNext").disabled = soulIdx <= 0;
+    box.innerHTML = (soulIdx === 0 && it.date !== today ? '<p class="note" style="margin:0 0 6px">오늘 글은 아직 올라오지 않았습니다. 가장 최근 글을 보여 드립니다.</p>' : "") +
+      '<article class="soul-text">' + soulText(it.text) + "</article>" +
+      (it.url ? '<p class="note" style="margin:8px 0 0"><a href="' + esc(it.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">영성센터 페이스북 원문 보기 ↗</a></p>' : "");
+  }
   function soul() {
     setTop("영성센터", false); setTab("soul");
-    var d = new Date(), wd = "일월화수목금토";
-    var h = secHead(3, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
-    h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
-      '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
-      '<p style="margin:0 0 8px">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 오늘 글을 아래에 펼쳐 보여 드립니다.</p>' +
-      '<div id="soulPost"></div>' +
-      '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
+    var h = secHead(3, "영성센터", "대한성공회 영성센터 · 생활과 묵상");
+    h += '<section class="card soul-head"><div class="lect-top"><h2 class="office-title" style="margin:0">오늘의 복음 묵상</h2>' +
+      '<span class="lect-nav"><button type="button" id="soulPrev" aria-label="이전 날">◀</button><button type="button" id="soulNext" aria-label="다음 날">▶</button></span></div>' +
+      '<div class="lect-date" id="soulDay"></div><div id="soulPost"></div></section>';
     h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
-      '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
-      '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
-      '<li>위 글 상자를 <b>아래로 내려가며</b> 읽으세요. 글이 길면 끝에 <b>「… 더 보기」</b>가 나오는데, 누르면 페이스북에서 <b>전문</b>이 열립니다.</li>' +
-      '<li>페이스북 <b>회원이 아니어도, 로그인하지 않아도</b> 볼 수 있습니다. 로그인 창이 뜨면 ✕나 「나중에」를 누르세요.</li>' +
-      '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
-      '<li>인터넷이 연결되어 있어야 보입니다.</li></ol></details>';
-    h += '<div class="hy-src"><b>출처 · 제공 경로</b><br>• 출처: 대한성공회 영성센터 (facebook.com/soulfriend21) (인터넷 연결 필요)<br>' +
-      '• 제공 경로: 페이스북이 제공하는 공식 게시물 보기 기능으로 <b>그대로 보여 주며</b>, 글을 이 앱에 저장하거나 고치지 않습니다.</div>';
+      '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 펴내는 <b>「생활과 묵상」</b>의 복음 묵상을 보여 드리는 곳입니다.</p>' +
+      '<ol class="hy-steps"><li>매일 아침 <b>그날의 복음 · 오늘의 말씀 · 오늘의 묵상 · 오늘의 기도</b>가 새로 올라옵니다.</li>' +
+      '<li>위 글을 <b>아래로 내려가며</b> 끝까지 읽으세요.</li>' +
+      '<li><b>◀ ▶</b> 버튼으로 지난 날의 묵상도 다시 볼 수 있습니다.</li>' +
+      '<li>한 번 본 묵상은 이 기기에 남아 있어 인터넷이 없어도 다시 볼 수 있습니다.</li>' +
+      '<li>읽고 나서 마음에 머문 구절과 느낌은 옆의 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li></ol></details>';
+    h += '<div class="hy-src"><b>출처 · 사용 허락</b><br>• 출처: 대한성공회 영성센터 「생활과 묵상」 (facebook.com/soulfriend21)<br>' +
+      '• 영성센터 담당 <b>김문영 신부님의 허락</b>(2026년 11월 21일)을 받아 원문 그대로 싣습니다. 내용을 고치거나 줄이지 않습니다.</div>';
     view.innerHTML = h;
     var sg = view.querySelector(".soul-guide"); if (sg) sg.addEventListener("toggle", function () { if (!sg.open) save("soulSeen", true); });
-    // soul.json: {"date":"YYYY-MM-DD","url":"오늘 게시물 주소"} — 날짜가 오늘이면 그 게시물을 펼쳐 보여 줌
-    fetch("soul.json?d=" + ymd(d), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (j) {
-      var box = document.getElementById("soulPost"); if (!box) return;
-      if (!j || !j.url || !/^https:\/\/www\.facebook\.com\//.test(j.url)) { box.innerHTML = '<p class="note" style="margin:4px 0">오늘 글은 아래 버튼을 눌러 보세요.</p>'; return; }
-      var today = j.date === ymd(d);
-      var w = Math.max(280, Math.min(500, box.clientWidth || 340));
-      box.innerHTML = (today ? "" : '<p class="note" style="margin:4px 0">오늘 글이 아직 연결되지 않아 가장 최근 글(' + esc(j.date) + ')을 보여 드립니다.</p>') +
-        '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
-        'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
-      var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
+    document.getElementById("soulPrev").onclick = function () { soulIdx++; soulRender(); };
+    document.getElementById("soulNext").onclick = function () { soulIdx = Math.max(0, soulIdx - 1); soulRender(); };
+    soulIdx = 0; soulRender();
+    fetch("soul.json?d=" + ymd(new Date()), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (j) {
+      if (j && Array.isArray(j.items) && j.items.length) {
+        j.items.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+        soulData = { items: j.items.slice(0, 60) }; save("soulData", soulData);
+      }
+      soulIdx = 0; soulRender();
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
