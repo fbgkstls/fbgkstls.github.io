@@ -1,11 +1,12 @@
 // Offline cache. Bump VERSION whenever any file changes (e.g. after update-content.ps1).
-var VERSION = "v2026-11-23x";
+var VERSION = "v2026-11-23y";
 var FILES = [
   "./", "./index.html", "./hymns.js", "./vendor/pdf.min.js", "./vendor/pdf.worker.min.js", "./note-guide.html", "./privacy.html", "./app.css", "./app.js", "./menu.js", "./content.js", "./lect.js", "./churches.js", "./bible.js",
   "./manifest.webmanifest", "./icons/emblem.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png"
 ];
 self.addEventListener("install", function (e) {
-  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
+  // cache: "reload" — 브라우저에 남은 예전 파일이 아니라 서버의 새 파일을 받아 저장
+  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(FILES.map(function (f) { return new Request(f, { cache: "reload" }); })); }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener("activate", function (e) {
   e.waitUntil(caches.keys().then(function (keys) {

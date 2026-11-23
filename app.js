@@ -1020,6 +1020,14 @@
   route();
 
   if ("serviceWorker" in navigator && location.protocol === "https:") {
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    // 새 버전이 설치되어 이 화면을 맡게 되면 한 번 자동으로 새로고침 (휴대폰에서 예전 화면이 남지 않도록)
+    var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadCtrl || reloaded) return; reloaded = true; location.reload();
+    });
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(function (reg) {
+      // 앱을 다시 볼 때마다 새 버전이 있는지 확인
+      document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") reg.update().catch(function () {}); });
+    }).catch(function () {});
   }
 })();
