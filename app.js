@@ -522,8 +522,15 @@
       var pp = String(j.date).split("-"), pd = new Date(+pp[0], +pp[1] - 1, +pp[2]);
       if (!isNaN(pd)) document.getElementById("soulDate").textContent = (pd.getMonth() + 1) + "월 " + pd.getDate() + "일 (" + wd[pd.getDay()] + ")" + (today ? " · 오늘" : "");
       document.getElementById("soulTitle").textContent = today ? "오늘의 복음 묵상" : "최근 복음 묵상";
-      box.innerHTML = '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
-        'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
+      // 페이스북 공식 스크립트(SDK)로 게시물을 넣으면 글 길이에 맞춰 높이가 자동으로 맞춰짐(아래 빈 공간 없음)
+      box.innerHTML = '<div class="fb-post soul-fb" data-href="' + esc(j.url) + '" data-width="' + w + '" data-show-text="true"></div>';
+      var parse = function () { try { window.FB.XFBML.parse(box); } catch (e) {} };
+      if (window.FB && window.FB.XFBML) parse();
+      else if (!document.getElementById("facebook-jssdk")) {
+        window.fbAsyncInit = function () { window.FB.init({ xfbml: false, version: "v19.0" }); parse(); };
+        var s = document.createElement("script"); s.id = "facebook-jssdk"; s.async = true; s.defer = true; s.crossOrigin = "anonymous";
+        s.src = "https://connect.facebook.net/ko_KR/sdk.js"; document.body.appendChild(s);
+      } else { var t = setInterval(function () { if (window.FB && window.FB.XFBML) { clearInterval(t); parse(); } }, 300); setTimeout(function () { clearInterval(t); }, 10000); }
       var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
     });
   }

@@ -297,6 +297,8 @@ details > summary, details.card > summary { padding: 7px 4px; }
 .hy-page { width: 100%; height: auto; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
 .hy-load { border: 2px solid var(--accent); }
 .hy-mode { grid-template-columns: 1fr 1fr; margin-bottom: 8px; }
+.soul-fb { display: block; margin: 4px auto 0; max-width: 500px; text-align: center; min-height: 120px; }
+.soul-fb[fb-xfbml-state="rendered"] { min-height: 0; }
 .soul-intro { margin: 0 0 6px; font-size: 13px; line-height: 1.5; color: var(--muted); }
 .soul-guide > summary { font-size: 14px; font-weight: 700; color: var(--accent); padding: 4px 0; }
 .soul-guide p { font-size: 14px; line-height: 1.6; }
