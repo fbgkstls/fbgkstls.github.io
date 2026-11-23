@@ -504,7 +504,7 @@
       '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
       '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
       '<li>위 글 상자를 <b>아래로 내려가며</b> 읽으세요. 복음 말씀과 오늘의 말씀은 로그인 없이 바로 보입니다.</li>' +
-      '<li>글이 길면 끝에 <b>「… 더 보기」</b>가 나옵니다. 묵상과 기도까지 <b>전문</b>을 보려면:<br>' +
+      '<li>묵상과 기도까지 <b>전문</b>은 글 상자 아래 <b>「📖 오늘 말씀 전문 보기」</b>를 누르면 <b>그날 글로 바로</b> 열립니다.<br>' +
       '· <b>휴대폰</b>: 페이스북 <b>앱이 열리거나 로그인</b>이 필요합니다. 로그인하지 않으면 빈 화면이 나올 수 있습니다.<br>' +
       '· <b>PC</b>: 로그인 창이 뜨면 <b>✕</b>를 누르면 전문이 보입니다.</li>' +
       '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
@@ -524,8 +524,9 @@
       box.innerHTML =
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
-      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 휴대폰에서 「더 보기」(전문)는 페이스북 앱이나 로그인이 필요합니다.</p>');
-      var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
+      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 전문은 아래 <b>「오늘 말씀 전문 보기」</b>를 누르면 그날 글로 바로 열립니다. (휴대폰은 페이스북 앱이나 로그인이 필요할 수 있습니다)</p>');
+      // 그날 글로 바로: 휴대폰에서도 첫 화면이 아니라 해당 게시물이 열리도록 모바일 주소 사용
+      var b = document.getElementById("soulBtn"); if (b) { b.href = j.url.replace("https://www.facebook.com/", "https://m.facebook.com/"); b.textContent = "📖 오늘 말씀 전문 보기 ↗"; }
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
