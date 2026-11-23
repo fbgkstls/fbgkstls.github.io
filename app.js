@@ -497,8 +497,7 @@
     setTop("영성센터", false); setTab("soul");
     var d = new Date(), wd = "일월화수목금토";
     var h = secHead(3, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
-    h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
-      '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
+    h += '<section class="card soul-head">' +
       '<div id="soulPost"></div>' +
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
     h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
@@ -517,6 +516,8 @@
       var box = document.getElementById("soulPost"); if (!box) return;
       if (!j || !j.url || !/^https:\/\/www\.facebook\.com\//.test(j.url)) { box.innerHTML = '<p class="note" style="margin:4px 0">오늘 글은 아래 버튼을 눌러 보세요.</p>'; return; }
       var today = j.date === ymd(d);
+      // 오늘 글이 아직 연결되지 않았으면 지난 글을 보여 주지 않고, 영성센터 페이스북(맨 위가 오늘 글)으로 안내
+      if (!today) { box.innerHTML = '<p class="note" style="margin:2px 0 4px">오늘 묵상은 아래 버튼을 누르면 영성센터 페이스북 맨 위에 있습니다.</p>'; return; }
       var w = Math.max(280, Math.min(500, box.clientWidth || 340));
       box.innerHTML =
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
