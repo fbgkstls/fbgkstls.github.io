@@ -522,7 +522,8 @@
       if (!today) { box.innerHTML = '<p class="note" style="margin:2px 0 4px">오늘 묵상은 아래 버튼을 누르면 영성센터 페이스북 맨 위에 있습니다.</p>'; return; }
       var w = Math.max(280, Math.min(500, box.clientWidth || 340));
       // 그날 글로 바로 가는 주소: 숫자 게시물 번호가 있으면 페이스북 표준 게시물 주소(휴대폰·앱에서도 그 글이 열림)
-      var direct = /^\d+$/.test(j.id || "") ? "https://m.facebook.com/story.php?story_fbid=" + j.id + "&id=soulfriend21" : j.url.replace("https://www.facebook.com/", "https://m.facebook.com/");
+      // 페이스북 '공유 링크'가 실제로 여는 주소와 같은 형식(페이지 숫자 번호 100064419772610 사용) — 휴대폰 페이스북 앱에서도 그 글이 열림
+      var direct = /^\d+$/.test(j.id || "") ? "https://www.facebook.com/story.php?story_fbid=" + j.id + "&id=100064419772610" : j.url;
       box.innerHTML = '<div class="soul-frame">' +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>' +
