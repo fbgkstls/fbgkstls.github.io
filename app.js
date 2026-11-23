@@ -497,8 +497,8 @@
     setTop("영성센터", false); setTab("soul");
     var d = new Date(), wd = "일월화수목금토";
     var h = secHead(3, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
-    h += '<section class="card soul-head"><div class="lect-date">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
-      '<h2 class="office-title" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
+    h += '<section class="card soul-head"><div class="lect-date" id="soulDate">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
+      '<h2 class="office-title" id="soulTitle" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
       '<p class="soul-intro">대한성공회 영성센터가 <b>매일 아침 7시</b>쯤 그날의 복음 말씀과 묵상을 올립니다. 오늘 글을 아래에 펼쳐 보여 드립니다.</p>' +
       '<div id="soulPost"></div>' +
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
@@ -519,7 +519,11 @@
       if (!j || !j.url || !/^https:\/\/www\.facebook\.com\//.test(j.url)) { box.innerHTML = '<p class="note" style="margin:4px 0">오늘 글은 아래 버튼을 눌러 보세요.</p>'; return; }
       var today = j.date === ymd(d);
       var w = Math.max(280, Math.min(500, box.clientWidth || 340));
-      box.innerHTML = (today ? "" : '<p class="note" style="margin:4px 0">오늘 글이 아직 연결되지 않아 가장 최근 글(' + esc(j.date) + ')을 보여 드립니다.</p>') +
+      // 날짜 표시를 실제로 보여 주는 글의 날짜에 맞춤 (오늘 날짜와 다른 글이 섞여 보이지 않게)
+      var pp = String(j.date).split("-"), pd = new Date(+pp[0], +pp[1] - 1, +pp[2]);
+      if (!isNaN(pd)) document.getElementById("soulDate").textContent = (pd.getMonth() + 1) + "월 " + pd.getDate() + "일 (" + wd[pd.getDay()] + ")" + (today ? " · 오늘" : "");
+      document.getElementById("soulTitle").textContent = today ? "오늘의 복음 묵상" : "최근 복음 묵상";
+      box.innerHTML = (today ? "" : '<p class="note" style="margin:4px 0">오늘 글은 아래 「페이스북에서 보기」를 누르면 맨 위에 있습니다.</p>') +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
       var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
