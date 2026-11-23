@@ -497,8 +497,8 @@
     setTop("영성센터", false); setTab("soul");
     var d = new Date(), wd = "일월화수목금토";
     var h = secHead(3, "영성센터", "대한성공회 영성센터 · 매일의 복음 묵상");
-    h += '<section class="card soul-head"><div class="lect-date" id="soulDate">' + (d.getMonth() + 1) + "월 " + d.getDate() + "일 (" + wd[d.getDay()] + ')</div>' +
-      '<h2 class="office-title" id="soulTitle" style="margin:2px 0 4px">오늘의 복음 묵상</h2>' +
+    h += '<section class="card soul-head"><div id="soulDate" hidden></div>' +
+      '<h2 class="office-title" id="soulTitle" style="margin:0 0 4px">오늘의 복음 묵상</h2>' +
       '<div id="soulPost"></div>' +
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
     h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
