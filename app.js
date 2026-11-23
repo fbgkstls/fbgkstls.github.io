@@ -521,12 +521,16 @@
       // 오늘 글이 아직 연결되지 않았으면 지난 글을 보여 주지 않고, 영성센터 페이스북(맨 위가 오늘 글)으로 안내
       if (!today) { box.innerHTML = '<p class="note" style="margin:2px 0 4px">오늘 묵상은 아래 버튼을 누르면 영성센터 페이스북 맨 위에 있습니다.</p>'; return; }
       var w = Math.max(280, Math.min(500, box.clientWidth || 340));
-      box.innerHTML =
+      // 그날 글로 바로 가는 주소: 숫자 게시물 번호가 있으면 페이스북 표준 게시물 주소(휴대폰·앱에서도 그 글이 열림)
+      var direct = /^\d+$/.test(j.id || "") ? "https://m.facebook.com/story.php?story_fbid=" + j.id + "&id=soulfriend21" : j.url.replace("https://www.facebook.com/", "https://m.facebook.com/");
+      box.innerHTML = '<div class="soul-frame">' +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
-        'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>';
-      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 전문은 아래 <b>「오늘 말씀 전문 보기」</b>를 누르면 그날 글로 바로 열립니다. (휴대폰은 페이스북 앱이나 로그인이 필요할 수 있습니다)</p>');
+        'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>' +
+        // 글 상자 위 투명 덮개: 「더 보기」 등 어디를 눌러도 페이스북 첫 화면이 아니라 그날 글로 열림
+        '<a class="soul-cover" href="' + esc(direct) + '" target="_blank" rel="noopener" aria-label="오늘 말씀 전문 보기"></a></div>';
+      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자나 아래 <b>「오늘 말씀 전문 보기」</b>를 누르면 그날 글 전문이 바로 열립니다.</p>');
       // 그날 글로 바로: 휴대폰에서도 첫 화면이 아니라 해당 게시물이 열리도록 모바일 주소 사용
-      var b = document.getElementById("soulBtn"); if (b) { b.href = j.url.replace("https://www.facebook.com/", "https://m.facebook.com/"); b.textContent = "📖 오늘 말씀 전문 보기 ↗"; }
+      var b = document.getElementById("soulBtn"); if (b) { b.href = direct; b.textContent = "📖 오늘 말씀 전문 보기 ↗"; }
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
