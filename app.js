@@ -503,7 +503,7 @@
       '<a class="hero-link" id="soulBtn" style="text-align:center;font-size:15px;margin-top:6px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 페이스북에서 보기 ↗</a></section>';
     h += '<details class="card soul-guide"' + (load("soulSeen", false) ? "" : " open") + '><summary>처음 오신 분께 · 이용 안내</summary>' +
       '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
-      '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
+      '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라오며, 위 글 상자도 그날 글로 바뀝니다. 아직 바뀌지 않았으면 <b>[페이스북에서 보기]</b>를 누르세요. 맨 위가 오늘 글입니다.</li>' +
       '<li>위 글 상자를 <b>아래로 내려가며</b> 읽으세요. 글이 길면 끝에 <b>「… 더 보기」</b>가 나오는데, 누르면 페이스북에서 <b>전문</b>이 열립니다.</li>' +
       '<li>페이스북 <b>회원이 아니어도, 로그인하지 않아도</b> 볼 수 있습니다. 로그인 창이 뜨면 ✕나 「나중에」를 누르세요.</li>' +
       '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
@@ -523,6 +523,7 @@
       if (!isNaN(pd)) document.getElementById("soulDate").textContent = (pd.getMonth() + 1) + "월 " + pd.getDate() + "일 (" + wd[pd.getDay()] + ")" + (today ? " · 오늘" : "");
       document.getElementById("soulTitle").textContent = today ? "오늘의 복음 묵상" : "최근 복음 묵상";
       // 페이스북 공식 스크립트(SDK)로 게시물을 넣으면 글 길이에 맞춰 높이가 자동으로 맞춰짐(아래 빈 공간 없음)
+      if (navigator.onLine === false) { box.innerHTML = '<p class="note" style="margin:4px 0">인터넷에 연결되면 영성센터 글이 보입니다.</p>'; return; }
       box.innerHTML = '<div class="fb-post soul-fb" data-href="' + esc(j.url) + '" data-width="' + w + '" data-show-text="true"></div>';
       var parse = function () { try { window.FB.XFBML.parse(box); } catch (e) {} };
       if (window.FB && window.FB.XFBML) parse();
