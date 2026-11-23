@@ -532,7 +532,6 @@
         var s = document.createElement("script"); s.id = "facebook-jssdk"; s.async = true; s.defer = true; s.crossOrigin = "anonymous";
         s.src = "https://connect.facebook.net/ko_KR/sdk.js"; document.body.appendChild(s);
       } else { var t = setInterval(function () { if (window.FB && window.FB.XFBML) { clearInterval(t); parse(); } }, 300); setTimeout(function () { clearInterval(t); }, 10000); }
-      var b = document.getElementById("soulBtn"); if (b) b.href = j.url;
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
