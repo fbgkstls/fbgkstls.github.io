@@ -506,15 +506,22 @@
   function soulDate(k) { var p = k.split("-"), x = new Date(+p[0], +p[1] - 1, +p[2]); return (+p[1]) + "월 " + (+p[2]) + "일 (" + "일월화수목금토"[x.getDay()] + ")"; }
   function soulRender() {
     var box = document.getElementById("soulPost"); if (!box) return;
-    var items = (soulData && soulData.items) || [];
-    if (!items.length) { box.innerHTML = '<p class="note" style="margin:4px 0">' + (navigator.onLine === false ? "인터넷에 연결되면 오늘의 묵상이 보입니다." : "묵상을 불러오는 중…") + "</p>"; return; }
+    var today = ymd(new Date());
+    var items = ((soulData && soulData.items) || []).slice();
+    // 오늘 글이 아직 앱에 없으면(그날 자동 업데이트가 돌지 않은 경우) 맨 앞에 '페이스북에서 보기' 자리를 둠
+    if (!items.length || items[0].date !== today) items.unshift({ date: today, fb: true });
     if (soulIdx >= items.length) soulIdx = 0;
-    var it = items[soulIdx], today = ymd(new Date());
+    var it = items[soulIdx];
     document.getElementById("soulDay").textContent = soulDate(it.date) + (it.date === today ? " · 오늘" : "");
     document.getElementById("soulPrev").disabled = soulIdx >= items.length - 1;
     document.getElementById("soulNext").disabled = soulIdx <= 0;
-    box.innerHTML = (soulIdx === 0 && it.date !== today ? '<p class="note" style="margin:0 0 6px">오늘 글은 아직 올라오지 않았습니다. 가장 최근 글을 보여 드립니다.</p>' : "") +
-      '<article class="soul-text">' + soulText(it.text) + "</article>" +
+    if (it.fb) {
+      box.innerHTML = '<p style="margin:4px 0 8px">오늘의 묵상이 아직 앱에 들어오지 않았습니다. 영성센터 페이스북에서 바로 보실 수 있습니다. (맨 위가 오늘 글)</p>' +
+        '<a class="hero-link" style="text-align:center;font-size:16px" href="' + SOUL_FB + '" target="_blank" rel="noopener">📖 오늘의 묵상 보기 (페이스북) ↗</a>' +
+        (items.length > 1 ? '<p class="note" style="margin:6px 0 0">◀ 버튼을 누르면 지난 묵상을 앱에서 볼 수 있습니다.</p>' : "");
+      return;
+    }
+    box.innerHTML = '<article class="soul-text">' + soulText(it.text) + "</article>" +
       (it.url ? '<p class="note" style="margin:8px 0 0"><a href="' + esc(it.url) + '" target="_blank" rel="noopener" style="color:var(--accent)">영성센터 페이스북 원문 보기 ↗</a></p>' : "");
   }
   function soul() {
