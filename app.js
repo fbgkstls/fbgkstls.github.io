@@ -534,6 +534,19 @@
       var direct = /Android/i.test(ua)
         ? "intent://facewebmodal/f?href=" + encodeURIComponent(post) + "#Intent;scheme=fb;package=com.facebook.katana;S.browser_fallback_url=" + encodeURIComponent(post) + ";end"
         : post;
+      var isPhone = /Android|iPhone|iPad|iPod/i.test(ua);
+      if (!isPhone) {
+        // PC: 페이스북 공식 퍼가기 스크립트로 글 길이에 맞춰 상자 높이를 자동 조절 (빈 공간 없이)
+        box.innerHTML = '<div class="soul-frame soul-pc"><div class="fb-post" data-href="' + esc(j.url) + '" data-width="' + w + '" data-show-text="true"></div>' +
+          '<a class="soul-cover" href="' + esc(direct) + '" target="_blank" rel="noopener" aria-label="영성센터에서 오늘 말씀 전문 보기"></a></div>';
+        var parse = function () { try { window.FB && FB.XFBML.parse(box); } catch (e) {} };
+        if (window.FB) parse();
+        else if (!document.getElementById("fbsdk")) {
+          window.fbAsyncInit = function () { parse(); };
+          var s = document.createElement("script"); s.id = "fbsdk"; s.async = true; s.defer = true; s.crossOrigin = "anonymous";
+          s.src = "https://connect.facebook.net/ko_KR/sdk.js#xfbml=0&version=v19.0"; document.body.appendChild(s);
+        }
+      } else
       box.innerHTML = '<div class="soul-frame">' +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>' +
