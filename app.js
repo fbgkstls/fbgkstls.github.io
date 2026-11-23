@@ -526,14 +526,20 @@
       // 휴대폰 페이스북 앱은 게시물 주소를 받으면 첫 화면으로 보내는 경우가 있어,
       // 페이스북이 공식으로 알려 주는 '페이지 열기' 앱 주소(fb://profile/페이지번호)를 씀 → 맨 위가 그날 글
       // 휴대폰 시험 결과(2026-11-23): story.php?story_fbid=글번호&id=페이지번호 주소가 휴대폰에서 그날 글을 바로 엶
-      var direct = /^\d+$/.test(j.id || "") ? "https://www.facebook.com/story.php?story_fbid=" + j.id + "&id=100064419772610" : "https://www.facebook.com/soulfriend21";
+      var post = /^\d+$/.test(j.id || "") ? "https://www.facebook.com/story.php?story_fbid=" + j.id + "&id=100064419772610" : "https://www.facebook.com/soulfriend21";
+      // 로그인된 페이스북 '앱' 안에서 그 글을 열어야 「더 보기」로 전문이 펼쳐짐 (브라우저로 열리면 로그인이 안 되어 첫 화면으로 감)
+      // 안드로이드: 페이스북 앱 안에서 해당 주소를 여는 앱 링크, 앱이 없으면 웹으로
+      var ua = navigator.userAgent || "";
+      var direct = /Android/i.test(ua)
+        ? "intent://facewebmodal/f?href=" + encodeURIComponent(post) + "#Intent;scheme=fb;package=com.facebook.katana;S.browser_fallback_url=" + encodeURIComponent(post) + ";end"
+        : post;
       box.innerHTML = '<div class="soul-frame">' +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>' +
         // 글 상자 위 투명 덮개: 「더 보기」 등 어디를 눌러도 페이스북 첫 화면이 아니라 그날 글로 열림
         // 시험 페이지와 같은 방식(새 창 없이)으로 열어야 휴대폰 페이스북 앱이 그 글을 엶
         '<a class="soul-cover" href="' + esc(direct) + '" aria-label="영성센터에서 오늘 말씀 전문 보기"></a></div>';
-      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자(「더 보기」 포함)나 아래 버튼을 누르면 <b>오늘 말씀 전문</b>이 페이스북에서 바로 열립니다.</p>');
+      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자(「더 보기」 포함)나 아래 버튼을 누르면 <b>페이스북 앱</b>에서 오늘 말씀이 열립니다. 로그인되어 있으면 「더 보기」로 전문을 볼 수 있습니다.</p>');
       // 그날 글로 바로: 휴대폰에서도 첫 화면이 아니라 해당 게시물이 열리도록 모바일 주소 사용
       var b = document.getElementById("soulBtn"); if (b) { b.href = direct; b.removeAttribute("target"); b.textContent = "📖 영성센터에서 오늘 말씀 전문 보기 ↗"; }
     });
