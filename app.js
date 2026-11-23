@@ -504,7 +504,7 @@
       '<p style="margin:4px 0 6px"><b>영성센터</b>는 대한성공회 영성센터(서울 정동)가 날마다 올리는 <b>복음 묵상</b>을 보여 드리는 곳입니다.</p>' +
       '<ol class="hy-steps"><li>매일 아침 7시쯤 <b>그날의 복음 말씀</b>과 <b>오늘의 말씀(묵상)</b>이 새로 올라옵니다.</li>' +
       '<li>위 글 상자를 <b>아래로 내려가며</b> 읽으세요. 복음 말씀과 오늘의 말씀은 로그인 없이 바로 보입니다.</li>' +
-      '<li>묵상과 기도까지 <b>전문</b>은 글 상자나 아래 <b>「📖 영성센터에서 오늘 말씀 전문 보기」</b>를 누르면 <b>성공회 영성센터 페이스북</b>이 열리고, <b>맨 위 글</b>이 오늘 말씀입니다.<br>' +
+      '<li>묵상과 기도까지 <b>전문</b>은 글 상자나 아래 <b>「📖 영성센터에서 오늘 말씀 전문 보기」</b>를 누르면 <b>그날 글로 바로</b> 열립니다.<br>' +
       '· <b>휴대폰</b>: 페이스북 <b>앱이 열리거나 로그인</b>이 필요합니다. 로그인하지 않으면 빈 화면이 나올 수 있습니다.<br>' +
       '· <b>PC</b>: 로그인 창이 뜨면 <b>✕</b>를 누르면 전문이 보입니다.</li>' +
       '<li>읽고 나서 마음에 머문 구절과 느낌은 아래 <b>묵상</b> 탭(묵상기록)에 적어 두면 좋습니다.</li>' +
@@ -525,17 +525,17 @@
       // 페이스북 '공유 링크'가 실제로 여는 주소와 같은 형식(페이지 숫자 번호 100064419772610 사용) — 휴대폰 페이스북 앱에서도 그 글이 열림
       // 휴대폰 페이스북 앱은 게시물 주소를 받으면 첫 화면으로 보내는 경우가 있어,
       // 페이스북이 공식으로 알려 주는 '페이지 열기' 앱 주소(fb://profile/페이지번호)를 씀 → 맨 위가 그날 글
-      var ua = navigator.userAgent || "", webPage = "https://www.facebook.com/soulfriend21";
-      var direct = /Android/i.test(ua) ? "intent://profile/100064419772610#Intent;scheme=fb;package=com.facebook.katana;S.browser_fallback_url=" + encodeURIComponent(webPage) + ";end"
-        : /iPhone|iPad|iPod/i.test(ua) ? "fb://profile/100064419772610" : j.url;
+      // 휴대폰 시험 결과(2026-11-23): story.php?story_fbid=글번호&id=페이지번호 주소가 휴대폰에서 그날 글을 바로 엶
+      var direct = /^\d+$/.test(j.id || "") ? "https://www.facebook.com/story.php?story_fbid=" + j.id + "&id=100064419772610" : "https://www.facebook.com/soulfriend21";
       box.innerHTML = '<div class="soul-frame">' +
         '<iframe title="성공회 영성센터 오늘의 묵상" src="https://www.facebook.com/plugins/post.php?href=' + encodeURIComponent(j.url) + "&width=" + w + '&show_text=true&locale=ko_KR" ' +
         'width="' + w + '" height="680" style="border:none;overflow:hidden;width:100%;max-width:500px;display:block;margin:4px auto 0;background:#fff;border-radius:10px" scrolling="no" frameborder="0" allowfullscreen="true" allow="clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>' +
         // 글 상자 위 투명 덮개: 「더 보기」 등 어디를 눌러도 페이스북 첫 화면이 아니라 그날 글로 열림
-        '<a class="soul-cover" href="' + esc(direct) + '"' + (/^https:/.test(direct) ? ' target="_blank" rel="noopener"' : "") + ' aria-label="영성센터에서 오늘 말씀 전문 보기"></a></div>';
-      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자나 아래 버튼을 누르면 <b>성공회 영성센터</b> 페이스북이 열립니다. <b>맨 위 글이 오늘 말씀</b>입니다.</p>');
+        // 시험 페이지와 같은 방식(새 창 없이)으로 열어야 휴대폰 페이스북 앱이 그 글을 엶
+        '<a class="soul-cover" href="' + esc(direct) + '" aria-label="영성센터에서 오늘 말씀 전문 보기"></a></div>';
+      box.insertAdjacentHTML("beforeend", '<p class="note" style="margin:4px 2px 0">※ 글 상자(「더 보기」 포함)나 아래 버튼을 누르면 <b>오늘 말씀 전문</b>이 페이스북에서 바로 열립니다.</p>');
       // 그날 글로 바로: 휴대폰에서도 첫 화면이 아니라 해당 게시물이 열리도록 모바일 주소 사용
-      var b = document.getElementById("soulBtn"); if (b) { b.href = direct; if (!/^https:/.test(direct)) b.removeAttribute("target"); b.textContent = "📖 영성센터에서 오늘 말씀 전문 보기 ↗"; }
+      var b = document.getElementById("soulBtn"); if (b) { b.href = direct; b.removeAttribute("target"); b.textContent = "📖 영성센터에서 오늘 말씀 전문 보기 ↗"; }
     });
   }
   // ---------- 성가 2015 (각자 기기에 불러온 PDF로 보기) ----------
