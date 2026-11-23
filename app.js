@@ -524,7 +524,9 @@
       document.getElementById("soulTitle").textContent = today ? "오늘의 복음 묵상" : "최근 복음 묵상";
       // 페이스북 공식 스크립트(SDK)로 게시물을 넣으면 글 길이에 맞춰 높이가 자동으로 맞춰짐(아래 빈 공간 없음)
       // [페이스북에서 보기]는 오늘 연결된 게시물로 바로 열기 (로그인 창의 ✕를 누르면 전문이 보임)
-      var sb = document.getElementById("soulBtn"); if (sb) sb.href = j.url;
+      // 휴대폰에서 게시물 주소를 그대로 열면 페이스북이 로그인·첫 화면으로 보내므로, 로그인 없이 그날 글이 열리는 공식 '게시물 보기' 주소를 씀
+      var sw = Math.max(320, Math.min(500, (window.innerWidth || 360) - 8));
+      var sb = document.getElementById("soulBtn"); if (sb) sb.href = "https://www.facebook.com/plugins/post.php?href=" + encodeURIComponent(j.url) + "&show_text=true&width=" + sw + "&locale=ko_KR";
       if (navigator.onLine === false) { box.innerHTML = '<p class="note" style="margin:4px 0">인터넷에 연결되면 영성센터 글이 보입니다.</p>'; return; }
       box.innerHTML = '<div class="fb-post soul-fb" data-href="' + esc(j.url) + '" data-width="' + w + '" data-show-text="true"></div>';
       var parse = function () { try { window.FB.XFBML.parse(box); } catch (e) {} };
